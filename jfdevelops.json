@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "package": "@jfdevelops/cli",
+    "version": "0.8.0"
+  },
+  "project": {
+    "name": "desk-garage",
+    "packageManager": "pnpm"
+  },
+  "formatter": "biome",
+  "targets": [
+    {
+      "path": "apps/web",
+      "kind": "app",
+      "template": "node-app",
+      "options": {}
+    }
+  ],
+  "addons": [],
+  "agents": [
+    "claude-code",
+    "codex",
+    "cursor",
+    "copilot"
+  ],
+  "skills": [
+    {
+      "name": "jf-coding-conventions",
+      "required": true,
+      "source": {
+        "package": "@jfdevelops/skills",
+        "version": "0.1.0",
+        "path": "./skills/jf-coding-conventions"
+      }
+    },
+    {
+      "name": "jf-git",
+      "required": true,
+      "source": {
+        "package": "@jfdevelops/skills",
+        "version": "0.1.0",
+        "path": "./skills/jf-git"
+      }
+    },
+    {
+      "name": "jf-naming-conventions",
+      "required": true,
+      "source": {
+        "package": "@jfdevelops/skills",
+        "version": "0.1.0",
+        "path": "./skills/jf-naming-conventions"
+      }
+    }
+  ],
+  "managedFiles": [
+    {
+      "path": ".agents/skills/jf-coding-conventions/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-coding-conventions"
+      },
+      "sha256": "26a9c9a5cadf7411854b77fbfe6c5e4b0395aa7954c6d4c7523aeb63726fdec9"
+    },
+    {
+      "path": ".agents/skills/jf-git/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-git"
+      },
+      "sha256": "6821cf9a9b7f657d3655a12618a9858fdbb14b24db03e8d65f52f8290b5ed21d"
+    },
+    {
+      "path": ".agents/skills/jf-git/references/branches.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-git"
+      },
+      "sha256": "78628604155f3f21591af3282994ac09002607fc10eba15d04a52eef956e4d45"
+    },
+    {
+      "path": ".agents/skills/jf-git/references/commits.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-git"
+      },
+      "sha256": "469359cb0aea1cb210d46297cdf46f56df18140d68177cd75734cd306df263a0"
+    },
+    {
+      "path": ".agents/skills/jf-git/references/pull-requests.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-git"
+      },
+      "sha256": "680d61f55251d79d4d1dbd2bbae3a5f1711c2fcb1007f7d2dcea4899a27fb70e"
+    },
+    {
+      "path": ".agents/skills/jf-naming-conventions/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-naming-conventions"
+      },
+      "sha256": "c1ea6bed067f524b497da315fa3921a2cebfff2f563bae885112b656197033a9"
+    },
+    {
+      "path": ".claude/skills/jf-coding-conventions/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-coding-conventions"
+      },
+      "sha256": "cd8184f448d4bb38964fd7d28713a8926db25f47ed93d402bad328e61050f602"
+    },
+    {
+      "path": ".claude/skills/jf-git/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-git"
+      },
+      "sha256": "b5387e82fafbaa8f2e6f85fb60e67d035fc04c49ba9b3d162efda886f8a0528f"
+    },
+    {
+      "path": ".claude/skills/jf-naming-conventions/SKILL.md",
+      "owner": {
+        "type": "skill",
+        "name": "jf-naming-conventions"
+      },
+      "sha256": "6f06b1f73a742e3a695a600d2a5a4d58d6e3f8c8289ef5852349fea269f7b0c0"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "8f1dd9d4127828a0e05efc18389f8bb43966d60d7c1284e19127d24654f6831f"
+    },
+    {
+      "path": ".gitignore",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
+    },
+    {
+      "path": "README.md",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "ac2698e059fc766e1960ded8dc9907716e117735a13ab6c713a8dbb19f988e1d"
+    },
+    {
+      "path": "apps/web/README.md",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "762f109889e05381cbf6f08d4716a70f9fa8687d4d7f557dec0506759f49eaee"
+    },
+    {
+      "path": "apps/web/package.json",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "e4f48e98753e173c22b66e93be7b3b909faba66a857af5fdf39e7d2e012b9c7a"
+    },
+    {
+      "path": "apps/web/src/index.ts",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "476ef582fc5eb1acb4f2554659b10635b0b409a156eb43b18dea1bdcbf18f9b9"
+    },
+    {
+      "path": "apps/web/test/index.test.ts",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "2e309118a585b3d8b7bf5c6e3115f34dce375574f81addd99cb2bdfbb5a45d1f"
+    },
+    {
+      "path": "apps/web/tsconfig.build.json",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "563beb8975bba0464056eda8122977378769230982b0dd66f6a624ac72bb7b83"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "72d3479be64b60fd95367d1ae42021c83d7901db71f16cad6998fbc2559f9880"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "c885a42d063f2cf2117fa706265e9a0f92a1ce26cd7d0637d7631ca04094deca"
+    },
+    {
+      "path": "biome.json",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "1804bc010c64df9c3374a3c8f6f6fcc2a6d5b77339437616136c57b25e87eeed"
+    },
+    {
+      "path": "eslint.config.js",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "230134cdd8bad9a668b0c4eeb8b86dd5a5e6bcf07daa040d51de20befa4bf678"
+    },
+    {
+      "path": "package.json",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "5bbb75d001920551b931faf2eec2025d31359fe71656f2f2ae12a52b476249d8"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "b3bd8bbeffde35a51d0a11e51c29b3fcbed8ad1504e51ecfc39eb4cc966dba95"
+    },
+    {
+      "path": "scripts/run-affected.mjs",
+      "owner": {
+        "type": "project"
+      },
+      "sha256": "2dd048f1df5166268f9daa964ed94456adc9bd3e3e0f015947e81425f5c4acce"
+    }
+  ]
+}
