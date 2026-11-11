@@ -1,66 +1,47 @@
-import { useEffect, useState } from 'react';
-
-interface Container {
-  id: string;
-  name: string;
-  deletedAt: string | null;
-}
-
-const storageKey = 'desk-garage:containers:v1';
-
-function readContainers(): Container[] {
-  try {
-    const value: unknown = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
-
-    if (
-      Array.isArray(value) &&
-      value.every(
-        (item) =>
-          typeof item === 'object' &&
-          item !== null &&
-          typeof item.id === 'string' &&
-          typeof item.name === 'string' &&
-          (item.deletedAt === null || typeof item.deletedAt === 'string'),
-      )
-    ) {
-      return value;
-    }
-  } catch {
-    // Fall back to the initial container if local storage is unavailable or malformed.
-  }
-
-  return [{ id: 'everyday', name: 'Everyday', deletedAt: null }];
-}
+import { useState } from 'react';
+import { Result } from 'effect';
+import { addContainer as add, loadContainers, restoreContainer as restore, trashContainer as trash } from '@desk-garage/containers';
+import { runContainerOperation } from './services/containers';
 
 export function useContainers() {
-  const [containers, setContainers] = useState(readContainers);
-  const [storageError, setStorageError] = useState('');
+  const [state, setState] = useState(() => {
+    const result = runContainerOperation(loadContainers);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(containers));
-      setStorageError('');
-    } catch {
-      setStorageError('Your changes could not be saved on this device.');
-    }
-  }, [containers]);
+    return Result.match(result, {
+      onSuccess: (containers) => ({ containers, storageError: '' }),
+      onFailure: (error) => ({ containers: [], storageError: error.message }),
+    });
+  });
 
   function addContainer(name: string) {
-    const id = crypto.randomUUID();
-    setContainers((current) => [...current, { id, name: name.trim(), deletedAt: null }]);
+    const result = runContainerOperation(add(name));
 
-    return id;
+    if (Result.isFailure(result)) {
+      setState((current) => ({ ...current, storageError: result.failure.message }));
+
+      return undefined;
+    }
+
+    setState({ containers: result.success.containers, storageError: '' });
+
+    return result.success.id;
+  }
+
+  function changeContainer(id: string, operation: typeof trash) {
+    const result = runContainerOperation(operation(id));
+    Result.match(result, {
+      onSuccess: (containers) => setState({ containers, storageError: '' }),
+      onFailure: (error) => setState((current) => ({ ...current, storageError: error.message })),
+    });
   }
 
   function trashContainer(id: string) {
-    setContainers((current) =>
-      current.map((container) => (container.id === id ? { ...container, deletedAt: new Date().toISOString() } : container)),
-    );
+    changeContainer(id, trash);
   }
 
   function restoreContainer(id: string) {
-    setContainers((current) => current.map((container) => (container.id === id ? { ...container, deletedAt: null } : container)));
+    changeContainer(id, restore);
   }
 
-  return { containers, addContainer, trashContainer, restoreContainer, storageError };
+  return { ...state, addContainer, trashContainer, restoreContainer };
 }

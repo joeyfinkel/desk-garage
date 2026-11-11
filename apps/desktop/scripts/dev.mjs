@@ -1,7 +1,5 @@
 import { spawn } from 'node:child_process';
-
 import { createServer } from 'vite-plus';
-
 import electron from 'electron';
 
 if (!process.env.PORTLESS_URL || !process.env.PORT) {

@@ -1,15 +1,9 @@
 import { useState } from 'react';
-
 import { Archive, ArrowLeft, Folder, HardDrive, House, LockKeyhole, Plus, RotateCcw, Trash2 } from 'lucide-react';
-
 import { Button } from '@desk-garage/ui/button';
-
 import { Input } from '@desk-garage/ui/input';
-
 import { cn } from '@desk-garage/ui/cn';
-
 import { EmptyContainer } from './components/empty-container';
-
 import { useContainers } from './use-containers';
 
 export function App() {
@@ -129,9 +123,13 @@ export function App() {
               event.preventDefault();
 
               if (name.trim()) {
-                setSelectedId(addContainer(name));
-                setName('');
-                setIsCreating(false);
+                const id = addContainer(name);
+
+                if (id) {
+                  setSelectedId(id);
+                  setName('');
+                  setIsCreating(false);
+                }
               }
             }}
           >

@@ -1,5 +1,4 @@
 import { app, BrowserWindow, Menu, nativeImage, Tray } from 'electron';
-
 import { fileURLToPath } from 'node:url';
 
 let window;

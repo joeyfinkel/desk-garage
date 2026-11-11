@@ -2,9 +2,7 @@
 // Runs each task with Vite+ in the packages changed since BASE_SHA and in the packages that depend on them.
 // A change outside every package, or a base that cannot be compared, runs the tasks in every package.
 import { execFileSync, spawnSync } from 'node:child_process';
-
 import { existsSync } from 'node:fs';
-
 import { dirname } from 'node:path';
 
 const tasks = process.argv.slice(2);

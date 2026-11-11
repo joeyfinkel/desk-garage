@@ -6,6 +6,7 @@ A private home for the files, links, and snippets you reach for often.
 
 - `apps/desktop`: Electron + React desktop app, shared by macOS and Windows.
 - `apps/web`: existing website placeholder.
+- `packages/containers`: Effect schemas, typed errors, storage service, and container operations.
 - `packages/ui`: shadcn components, `cn`, and shared Tailwind styles.
 - `packages/theme`: framework-independent CSS theme tokens.
 
@@ -13,7 +14,7 @@ Shared code belongs in packages. Native mobile components will consume the same 
 
 ## Application runtime
 
-Use Effect for application services, asynchronous workflows, resource lifecycles, and typed errors as the app grows. Keep React components focused on presentation and local interaction state. Shared services belong in workspace packages; platform-specific adapters stay with their app. The current UI foundation does not yet integrate Effect.
+Use Effect for application services, asynchronous workflows, resource lifecycles, and typed errors as the app grows. Keep React components focused on presentation and local interaction state. Shared services belong in workspace packages; platform-specific adapters stay with their app. Container persistence and create/trash/restore workflows use Effect 4. The desktop supplies a local-storage adapter and interprets synchronous effects at the React boundary. Mutations update the UI only after persistence succeeds; invalid stored data is reported without overwriting it.
 
 ## Develop on macOS
 
