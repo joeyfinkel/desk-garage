@@ -9,7 +9,7 @@
       "!package-lock.json",
       "!yarn.lock",
       "!bun.lock",
-      "!dist"
+      "!**/dist/**"
     ]
   },
   "formatter": {
@@ -21,6 +21,11 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "single"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   }
 }
