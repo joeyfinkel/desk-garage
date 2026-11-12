@@ -1,3 +1,5 @@
+import { ContainerCreate } from '../../components/container-create';
+import { ContainerDelete } from '../../components/container-delete';
 import { WorkspaceBoundary } from '../../components/workspace-boundary';
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { RouteError } from '../-components/route-error';
@@ -17,7 +19,7 @@ export const Route = createFileRoute('/quick')({
 
 function QuickLayout() {
   const { selected, active } = useQuickContainer();
-  const { trashContainer, isWorking } = useContainerWorkspace();
+  const { isWorking } = useContainerWorkspace();
   const navigate = Route.useNavigate();
 
   return (
@@ -62,24 +64,27 @@ function QuickLayout() {
             ))}
           </SelectContent>
         </Select>
-        <Button size="icon" variant="outline" asChild>
-          <Link to="/quick/new" search={{ containerId: selected?.id }} aria-label="Create container">
-            <Plus />
-          </Link>
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={!selected || isWorking}
-          aria-label="Remove current container"
-          onClick={() => {
-            if (selected) {
-              void trashContainer(selected.id);
-            }
+        <ContainerCreate
+          onCreated={(containerId) => {
+            void navigate({ to: '/quick', search: { containerId } });
           }}
         >
-          <Trash2 />
-        </Button>
+          <Button size="icon" variant="outline" aria-label="Create container" disabled={isWorking}>
+            <Plus />
+          </Button>
+        </ContainerCreate>
+        {selected && (
+          <ContainerDelete
+            container={selected}
+            onDeleted={() => {
+              void navigate({ to: '/quick', search: {}, replace: true });
+            }}
+          >
+            <Button size="icon" variant="ghost" disabled={isWorking} aria-label="Remove current container">
+              <Trash2 />
+            </Button>
+          </ContainerDelete>
+        )}
       </div>
       <nav className="flex shrink-0 gap-2 px-3 pt-3" aria-label="Quick access views">
         <Button size="sm" variant="ghost" asChild>

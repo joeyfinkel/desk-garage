@@ -11,19 +11,10 @@ export const layoutState = createRenderState({
       summary: createProp.component({ type: 'ReactNode' }).optional(),
     },
   },
-  render: function LayoutState(
-    { title, description, summary, children },
-    { composables }
-  ) {
+  render: function LayoutState({ title, description, summary, children }, { composables }) {
     return (
-      <composables.Layout
-        aria-label={typeof title === 'string' ? title : undefined}
-      >
-        {(summary ?? description) && (
-          <p className='mb-5 whitespace-pre-wrap text-sm text-muted-foreground'>
-            {summary ?? description}
-          </p>
-        )}
+      <composables.Layout aria-label={typeof title === 'string' ? title : undefined}>
+        {(summary ?? description) && <p className="mb-5 whitespace-pre-wrap text-sm text-muted-foreground">{summary ?? description}</p>}
         <composables.Content>{children}</composables.Content>
       </composables.Layout>
     );

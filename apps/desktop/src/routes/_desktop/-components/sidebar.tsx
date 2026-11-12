@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Button } from '@desk-garage/ui/button';
-import { ContainerEdit } from './container-edit';
+import { ContainerEdit } from '../../../components/container-edit';
+import { ContainerCreate } from '../../../components/container-create';
+import { ContainerDelete } from '../../../components/container-delete';
 import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router';
 import { Folder, HardDrive, Pencil, Plus, Trash2 } from 'lucide-react';
 import {
@@ -15,14 +15,14 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuAction,
 } from '@desk-garage/ui/sidebar';
 import { useContainerWorkspace } from '../../-utils/containers';
 
 export function WorkspaceSidebar() {
-  const { containers, items, trashContainer, isWorking } = useContainerWorkspace();
+  const { containers, items, isWorking } = useContainerWorkspace();
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
-  const [editingId, setEditingId] = useState<string>();
   const active = containers.filter((container) => !container.deletedAt);
   const trashCount =
     containers.filter((container) => container.deletedAt).length +
@@ -31,16 +31,19 @@ export function WorkspaceSidebar() {
 
   return (
     <>
-      <ContainerEdit container={active.find((container) => container.id === editingId)} onClose={() => setEditingId(undefined)} />
       <Sidebar collapsible="icon" className="top-12 h-[calc(100svh-3rem)] border-r">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Private containers</SidebarGroupLabel>
-            <SidebarGroupAction asChild>
-              <Link to="/containers/new" aria-label="Create container">
+            <ContainerCreate
+              onCreated={(id) => {
+                void navigate({ to: '/containers/$containerId', params: { containerId: id } });
+              }}
+            >
+              <SidebarGroupAction aria-label="Create container" disabled={isWorking}>
                 <Plus />
-              </Link>
-            </SidebarGroupAction>
+              </SidebarGroupAction>
+            </ContainerCreate>
             <SidebarGroupContent>
               <SidebarMenu>
                 {active.map((container) => (
@@ -56,33 +59,23 @@ export function WorkspaceSidebar() {
                         <span>{container.name}</span>
                       </Link>
                     </SidebarMenuButton>
-                    <div className="absolute right-1 top-0 flex h-8 items-center opacity-0 transition-opacity group-hover/menu-item:opacity-100 group-focus-within/menu-item:opacity-100 group-data-[collapsible=icon]:hidden">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="size-7"
-                        aria-label={`Edit ${container.name}`}
-                        onClick={() => setEditingId(container.id)}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="size-7"
-                        disabled={isWorking}
-                        aria-label={`Move ${container.name} to trash`}
-                        onClick={async () => {
-                          const isSelected = !!matchRoute({ to: '/containers/$containerId', params: { containerId: container.id } });
-
-                          if ((await trashContainer(container.id)) && isSelected) {
-                            void navigate({ to: '/containers', replace: true });
-                          }
-                        }}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
-                    </div>
+                    <ContainerEdit container={container}>
+                      <SidebarMenuAction showOnHover className="right-7" aria-label={`Edit ${container.name}`} disabled={isWorking}>
+                        <Pencil />
+                      </SidebarMenuAction>
+                    </ContainerEdit>
+                    <ContainerDelete
+                      container={container}
+                      onDeleted={() => {
+                        if (matchRoute({ to: '/containers/$containerId', params: { containerId: container.id } })) {
+                          void navigate({ to: '/containers', replace: true });
+                        }
+                      }}
+                    >
+                      <SidebarMenuAction showOnHover aria-label={`Move ${container.name} to trash`} disabled={isWorking}>
+                        <Trash2 />
+                      </SidebarMenuAction>
+                    </ContainerDelete>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

@@ -1,31 +1,59 @@
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import type { ReactNode } from 'react';
 import type { Container } from '@desk-garage/containers';
+import { Atom } from 'effect/reactivity';
+import { make as makeScopedAtom, useAtom } from '@effect/atom-react';
 import { Plus } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { cn } from '@desk-garage/ui/cn';
+import { DialogClose, DialogFooter } from '@desk-garage/ui/dialog';
 import { Input } from '@desk-garage/ui/input';
 import { useContainerWorkspace } from '../routes/-utils/containers';
+
+const nameState = makeScopedAtom((initial: string) => Atom.make(initial));
+const descriptionState = makeScopedAtom((initial: string) => Atom.make(initial));
 
 export function ContainerForm({
   onCreated,
   cancel,
   container,
+  variant = 'page',
 }: {
   onCreated: (id: string) => void;
-  cancel: ReactNode;
+  cancel?: ReactNode;
   container?: Container;
+  variant?: 'page' | 'dialog';
+}) {
+  return (
+    <nameState.Provider value={container?.name ?? ''}>
+      <descriptionState.Provider value={container?.description ?? ''}>
+        <ContainerFields onCreated={onCreated} cancel={cancel} container={container} variant={variant} />
+      </descriptionState.Provider>
+    </nameState.Provider>
+  );
+}
+
+function ContainerFields({
+  onCreated,
+  cancel,
+  container,
+  variant,
+}: {
+  onCreated: (id: string) => void;
+  cancel?: ReactNode;
+  container?: Container;
+  variant: 'page' | 'dialog';
 }) {
   const formId = useId();
   const nameId = `${formId}-name`;
   const descriptionId = `${formId}-description`;
-  const [name, setName] = useState(container?.name ?? '');
-  const [description, setDescription] = useState(container?.description ?? '');
+  const [name, setName] = useAtom(nameState.use());
+  const [description, setDescription] = useAtom(descriptionState.use());
   const { addContainer, command, isWorking, storageError } = useContainerWorkspace();
 
   return (
     <form
-      className={cn('w-full', !container && 'max-w-md')}
+      className={cn('w-full', variant === 'page' && !container && 'max-w-md')}
       onSubmit={async (event) => {
         event.preventDefault();
         const id = container
@@ -66,13 +94,27 @@ export function ContainerForm({
           {storageError}
         </p>
       )}
-      <div className="mt-6 flex gap-2">
-        <Button type="submit" disabled={!name.trim() || isWorking}>
-          {!container && <Plus />}
-          {container ? 'Save changes' : 'Create container'}
-        </Button>
-        {cancel}
-      </div>
+      {variant === 'dialog' ? (
+        <DialogFooter className="mt-6">
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="submit" disabled={!name.trim() || isWorking}>
+            {!container && <Plus />}
+            {container ? 'Save changes' : 'Create container'}
+          </Button>
+        </DialogFooter>
+      ) : (
+        <div className="mt-6 flex gap-2">
+          <Button type="submit" disabled={!name.trim() || isWorking}>
+            {!container && <Plus />}
+            {container ? 'Save changes' : 'Create container'}
+          </Button>
+          {cancel}
+        </div>
+      )}
     </form>
   );
 }

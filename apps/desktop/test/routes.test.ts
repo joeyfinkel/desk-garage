@@ -129,7 +129,19 @@ describe('desktop routes', () => {
       await act(async () => collapse?.click());
       expect(header?.textContent).toContain('Desk Garage');
 
-      expect(element.querySelector('a[href="/containers/new"]')?.textContent).not.toContain('New container');
+      expect(element.querySelector('a[href="/containers/new"]')).toBeNull();
+      const create = element.querySelector<HTMLButtonElement>('button[aria-label="Create container"]');
+      expect(create?.getAttribute('data-sidebar')).toBe('group-action');
+      await act(async () => create?.click());
+      expect(document.querySelector('[data-slot="dialog-content"]')?.textContent).toContain('New container');
+      await act(async () => {
+        Array.from(document.querySelectorAll<HTMLButtonElement>('[data-slot="dialog-content"] button'))
+          .find((button) => button.textContent === 'Cancel')
+          ?.click();
+      });
+      expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+      expect(element.querySelector('button[aria-label="Edit Everyday"]')?.getAttribute('data-sidebar')).toBe('menu-action');
+      expect(element.querySelector('button[aria-label="Move Everyday to trash"]')?.getAttribute('data-sidebar')).toBe('menu-action');
       expect(Array.from(element.querySelectorAll('button')).some((button) => button.textContent === 'Add files')).toBe(false);
       const trigger = element.querySelector<HTMLButtonElement>('button[aria-label="Container actions"]');
       expect(trigger).not.toBeNull();
@@ -152,6 +164,18 @@ describe('desktop routes', () => {
       expect(name?.value).toBe('Everyday');
       const cancel = Array.from(dialog?.querySelectorAll('button') ?? []).find((button) => button.textContent === 'Cancel');
       await act(async () => cancel?.click());
+      expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+      const remove = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-slot="popover-content"] button')).find(
+        (button) => button.textContent === 'Delete container',
+      );
+      await act(async () => remove?.click());
+      expect(document.querySelector('[data-slot="dialog-content"]')?.textContent).toContain('Delete container?');
+      expect(commands.some((entry) => entry.type === 'trashContainer')).toBe(false);
+      await act(async () => {
+        Array.from(document.querySelectorAll<HTMLButtonElement>('[data-slot="dialog-content"] button'))
+          .find((button) => button.textContent === 'Cancel')
+          ?.click();
+      });
       expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
     } finally {
       await act(async () => root.unmount());

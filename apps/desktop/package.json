@@ -15,6 +15,7 @@
     "@desk-garage/theme": "workspace:*",
     "@desk-garage/ui": "workspace:*",
     "@desk-garage/workspace": "workspace:*",
+    "@effect/atom-react": "4.1.4",
     "@jfdevelops/react-layout": "^2.7.0",
     "@tanstack/react-router": "^1.170.46",
     "effect": "^4.1.4",
