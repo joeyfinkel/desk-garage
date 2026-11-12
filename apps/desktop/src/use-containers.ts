@@ -54,8 +54,8 @@ export function useContainers() {
     return run(runWorkspaceCommand(command));
   }
 
-  async function addContainer(name: string) {
-    const next = await command({ type: 'createContainer', name });
+  async function addContainer(name: string, description?: string) {
+    const next = await command({ type: 'createContainer', name, description });
 
     return next?.containers.at(-1)?.id;
   }

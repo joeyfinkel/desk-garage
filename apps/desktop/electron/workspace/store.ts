@@ -2,15 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { copyFile, lstat, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { basename, isAbsolute, join } from 'node:path';
 import { Effect, Schema, Semaphore } from 'effect';
-import {
-  addContainer,
-  ContainerError,
-  ContainerStorage,
-  Containers,
-  initialContainers,
-  restoreContainer,
-  trashContainer,
-} from '@desk-garage/containers';
+import { ContainerError, ContainerStorage, Containers, initialContainers, restoreContainer, trashContainer } from '@desk-garage/containers';
 import { type FileItem, Workspace, type WorkspaceCommand, WorkspaceError } from '@desk-garage/workspace';
 
 export function createWorkspaceStore(root: string) {
@@ -151,9 +143,36 @@ export function createWorkspaceStore(root: string) {
           return yield* new WorkspaceError({ message: 'This action requires the native file dialog.' });
         }
 
+        if (command.type === 'updateContainer' || command.type === 'createContainer') {
+          const name = command.name.trim();
+          const description = command.description?.trim() || undefined;
+
+          if (!name || name.length > 80 || (description?.length ?? 0) > 1000) {
+            return yield* new WorkspaceError({
+              message: 'Use a name between 1 and 80 characters and a description up to 1,000 characters.',
+            });
+          }
+
+          if (
+            command.type === 'updateContainer' &&
+            !workspace.containers.some((container) => container.id === command.id && !container.deletedAt)
+          ) {
+            return yield* new WorkspaceError({ message: 'This container is unavailable or in the trash.' });
+          }
+
+          const containers =
+            command.type === 'createContainer'
+              ? [...workspace.containers, { id: randomUUID(), name, description, deletedAt: null }]
+              : workspace.containers.map((container) => (container.id === command.id ? { ...container, name, description } : container));
+          const next = { ...workspace, containers, revision: workspace.revision + 1 };
+          yield* save(next);
+
+          return next;
+        }
+
         let next: Workspace = workspace;
 
-        if (command.type === 'createContainer' || command.type === 'trashContainer' || command.type === 'restoreContainer') {
+        if (command.type === 'trashContainer' || command.type === 'restoreContainer') {
           const storage = ContainerStorage.of({
             read: Effect.succeed(JSON.stringify(workspace.containers)),
             createId: Effect.sync(randomUUID),
@@ -166,11 +185,7 @@ export function createWorkspaceStore(root: string) {
               ),
           });
           const operation =
-            command.type === 'createContainer'
-              ? addContainer(command.name)
-              : command.type === 'trashContainer'
-                ? trashContainer(command.id)
-                : restoreContainer(command.id).pipe(Effect.asVoid);
+            command.type === 'trashContainer' ? trashContainer(command.id) : restoreContainer(command.id).pipe(Effect.asVoid);
           yield* operation.pipe(
             Effect.provideService(ContainerStorage, storage),
             Effect.mapError((cause) => new WorkspaceError({ message: cause.message, cause })),
@@ -221,7 +236,7 @@ export function createWorkspaceStore(root: string) {
         }
 
         // Use only metadata written by the store, and reject unsafe metadata if the file was edited externally.
-        if (basename(item.name) !== item.name || !/^[a-f0-9-]{36}$/.test(item.id)) {
+        if (['.', '..'].includes(item.name) || basename(item.name) !== item.name || !/^[a-f0-9-]{36}$/.test(item.id)) {
           return yield* new WorkspaceError({ message: 'The saved file location is invalid.' });
         }
 

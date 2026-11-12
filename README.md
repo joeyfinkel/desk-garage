@@ -19,7 +19,7 @@ The desktop uses `@jfdevelops/react-layout` with a central resource definition i
 
 ## Routing
 
-The desktop uses TanStack Router file routes with hash history, so packaged `file://` loads and Portless development use the same paths. The root route keeps the sidebar and container workspace mounted around its outlet. Container selection lives in `/containers/$containerId`; creation uses `/containers/new`, and recovery uses `/trash`. The `/containers` index opens the first active container, or the empty workspace if none remain.
+The desktop uses TanStack Router file routes with hash history, so packaged `file://` loads and Portless development use the same paths. The root route owns the container workspace. A persistent `_desktop` pathless route keeps the shadcn sidebar around the full-window outlet; `/quick` has its own compact shell. Container selection lives in `/containers/$containerId`; creation uses `/containers/new`, and recovery uses `/trash`. The `/containers` index opens the first active container, or the empty workspace if none remain.
 
 Route-private components and utilities use `-components` and `-utils` directories, which the route generator ignores. The Vite plugin generates `src/route-tree.gen.ts` during development and builds; commit the generated tree so typechecking also works immediately after checkout. Do not edit it manually.
 
@@ -38,7 +38,9 @@ pnpm dev
 
 The development command starts the renderer through Portless and opens Electron at the URL provided by Portless (`https://desk-garage.localhost` with default proxy settings). Do not start a renderer server separately. The Electron binary downloads on its first invocation.
 
-Closing the window keeps DeskGarage in the menu bar. Use the tray menu to reopen or quit it. Stop `pnpm dev` to stop the development session.
+DeskGarage starts in the menu bar without opening the full window. Click its status icon for quick access: switch or create containers, import and export files, remove items or containers, and recover them from trash. The expand button opens the full window at the selected container. Right-click the status icon for the full-window and Quit actions. While DeskGarage is focused, **Window → Quick Access** (`Cmd/Ctrl+Shift+Space`) opens the same panel.
+
+The panel hides on click-away or Escape and stays open for native file dialogs. The full window is created only when requested; closing it releases its renderer while DeskGarage stays in the tray. The compact and full windows receive native change notifications, with revision checks preventing stale responses from rolling back either view. Stop `pnpm dev` to stop the development session.
 
 Private containers support file import through the native picker or drag and drop (up to 100 regular files per batch). Files are copied into `app.getPath('userData')/workspace/files`; atomic metadata updates live in `workspace/workspace.json`. Imports never move the originals or load entire files into the renderer. Existing browser-stored containers migrate once, retaining their original browser-storage backup.
 

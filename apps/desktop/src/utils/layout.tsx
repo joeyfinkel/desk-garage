@@ -1,4 +1,3 @@
-import { LockKeyhole } from 'lucide-react';
 import { createProp, defineResourceLayout } from '@jfdevelops/react-layout';
 import { PageFrame } from '@desk-garage/ui/page-frame';
 import { PageHeader } from '@desk-garage/ui/page-header';
@@ -18,6 +17,7 @@ export const workspaceLayout = defineResourceLayout({
     props: {
       include: { description: true },
       custom: {
+        subtitle: createProp.component({ type: 'ReactNode' }).optional(),
         title: createProp.component({ type: 'ReactNode' }),
         children: createProp.component({ type: 'ReactNode' }),
         eyebrow: createProp.component({ type: 'ReactNode' }).optional(),
@@ -25,30 +25,12 @@ export const workspaceLayout = defineResourceLayout({
         footer: createProp.component({ type: 'ReactNode' }).optional(),
       },
     },
-    render: function ResourcePage(
-      {
-        title,
-        description,
-        children,
-        actions,
-        eyebrow = (
-          <>
-            <LockKeyhole size={12} />
-            Private workspace
-          </>
-        ),
-        footer = (
-          <footer className="mt-6 flex items-center justify-between text-[11px] text-muted-foreground">
-            <span>DESKGARAGE · EARLY PREVIEW</span>
-            <span>Private by default. Yours to keep.</span>
-          </footer>
-        ),
-      },
-      { composables },
-    ) {
+    render: function ResourcePage({ title, description, subtitle, children, actions, eyebrow, footer }, { composables }) {
       return (
         <composables.Layout>
-          <composables.Header title={title} description={description} eyebrow={eyebrow} actions={actions} />
+          {(subtitle === undefined ? description : subtitle) && (
+            <p className="mb-5 whitespace-pre-wrap text-sm text-muted-foreground">{subtitle === undefined ? description : subtitle}</p>
+          )}
           <composables.Content>{children}</composables.Content>
           {footer}
         </composables.Layout>

@@ -21,6 +21,34 @@ async function setup() {
 }
 
 describe('native file storage', () => {
+  it('edits and clears optional descriptions while preserving legacy containers and files', async () => {
+    const { root, store } = await setup();
+    const source = join(root, 'keep.txt');
+    await writeFile(source, 'keep');
+    const imported = await Effect.runPromise(store.execute({ type: 'importFiles', containerId: 'everyday', paths: [source] }));
+    const updated = await Effect.runPromise(
+      store.execute({ type: 'updateContainer', id: 'everyday', name: '  Essentials  ', description: '  Daily files  ' }),
+    );
+    expect(updated.containers[0]).toMatchObject({ name: 'Essentials', description: 'Daily files' });
+    expect(updated.items).toEqual(imported.items);
+    const restarted = createWorkspaceStore(join(root, 'garage'));
+    expect((await Effect.runPromise(restarted.execute({ type: 'load' }))).containers[0]?.description).toBe('Daily files');
+    const cleared = await Effect.runPromise(
+      restarted.execute({ type: 'updateContainer', id: 'everyday', name: 'Essentials', description: '   ' }),
+    );
+    expect(cleared.containers[0]?.description).toBeUndefined();
+    const invalid = await Effect.runPromise(
+      restarted.execute({ type: 'updateContainer', id: 'everyday', name: '', description: 'changed' }).pipe(Effect.result),
+    );
+    expect(Result.isFailure(invalid)).toBe(true);
+    expect((await Effect.runPromise(restarted.execute({ type: 'load' }))).containers).toEqual(cleared.containers);
+    await Effect.runPromise(restarted.execute({ type: 'trashContainer', id: 'everyday' }));
+    const trashed = await Effect.runPromise(
+      restarted.execute({ type: 'updateContainer', id: 'everyday', name: 'Hidden' }).pipe(Effect.result),
+    );
+    expect(Result.isFailure(trashed)).toBe(true);
+  });
+
   it('owns an exact independent copy and survives a store restart', async () => {
     const { root, store } = await setup();
     const original = join(root, 'headshot.png');

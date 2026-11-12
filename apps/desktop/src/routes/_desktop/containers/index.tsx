@@ -1,10 +1,10 @@
 import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
 import { Folder, Plus } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
-import { useContainerWorkspace } from '../-utils/containers';
+import { useContainerWorkspace } from '../../-utils/containers';
 import { ContainersPage } from './-components/page';
 
-export const Route = createFileRoute('/containers/')({ component: ContainersIndex });
+export const Route = createFileRoute('/_desktop/containers/')({ component: ContainersIndex });
 
 function ContainersIndex() {
   const { containers, isLoading } = useContainerWorkspace();

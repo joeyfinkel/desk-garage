@@ -1,19 +1,24 @@
 import { BrowserWindow, dialog, ipcMain, nativeImage } from 'electron';
-import type { IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { copyFile } from 'node:fs/promises';
 import { Effect, Result, Schema } from 'effect';
 import { WorkspaceCommand, WorkspaceError, type WorkspaceResponse } from '@desk-garage/workspace';
+import { getTrustedWindow } from '../trusted-window';
 import type { createWorkspaceStore } from './store';
 
 export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceStore>, dragIconPath: string) {
-  function assertSender(event: IpcMainEvent | IpcMainInvokeEvent) {
-    const owner = BrowserWindow.fromWebContents(event.sender);
+  const dialogs = new Set<number>();
 
-    if (!owner || event.senderFrame !== event.sender.mainFrame) {
-      throw new Error('Untrusted workspace request.');
-    }
+  function withDialog<A>(window: BrowserWindow, action: () => Promise<A>) {
+    dialogs.add(window.id);
 
-    return owner;
+    return action().finally(() => {
+      dialogs.delete(window.id);
+
+      if (!window.isDestroyed()) {
+        window.show();
+        window.focus();
+      }
+    });
   }
 
   function notify() {
@@ -24,21 +29,23 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
 
   ipcMain.handle('workspace:command', async (event, input: unknown): Promise<WorkspaceResponse> => {
     try {
-      const window = assertSender(event);
+      const window = getTrustedWindow(event);
       const command = await Effect.runPromise(Schema.decodeUnknownEffect(WorkspaceCommand)(input));
       let operation;
 
       if (command.type === 'pickFiles') {
-        const result = await dialog.showOpenDialog(window, {
-          title: 'Add files to DeskGarage',
-          properties: ['openFile', 'multiSelections'],
-        });
+        const result = await withDialog(window, () =>
+          dialog.showOpenDialog(window, {
+            title: 'Add files to DeskGarage',
+            properties: ['openFile', 'multiSelections'],
+          }),
+        );
         operation = result.canceled
           ? store.execute({ type: 'load' })
           : store.execute({ type: 'importFiles', containerId: command.containerId, paths: result.filePaths });
       } else if (command.type === 'exportItem') {
         const file = await Effect.runPromise(store.fileForItem(command.id));
-        const result = await dialog.showSaveDialog(window, { title: 'Save a copy', defaultPath: file.item.name });
+        const result = await withDialog(window, () => dialog.showSaveDialog(window, { title: 'Save a copy', defaultPath: file.item.name }));
 
         if (!result.canceled && result.filePath) {
           await copyFile(file.path, result.filePath);
@@ -71,7 +78,7 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
   });
 
   ipcMain.on('workspace:drag', (event, input: unknown) => {
-    assertSender(event);
+    getTrustedWindow(event);
 
     if (typeof input !== 'string') {
       return;
@@ -85,4 +92,6 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
       })
       .catch(() => event.sender.send('workspace:changed'));
   });
+
+  return { hasDialog: (window: BrowserWindow) => dialogs.has(window.id) };
 }

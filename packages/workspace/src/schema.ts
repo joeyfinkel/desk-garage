@@ -20,7 +20,13 @@ export type Workspace = typeof Workspace.Type;
 
 export const WorkspaceCommand = Schema.Union([
   Schema.Struct({ type: Schema.Literal('load'), legacyContainers: Schema.optional(Schema.NullOr(Schema.String)) }),
-  Schema.Struct({ type: Schema.Literal('createContainer'), name: Schema.String }),
+  Schema.Struct({ type: Schema.Literal('createContainer'), name: Schema.String, description: Schema.optional(Schema.String) }),
+  Schema.Struct({
+    type: Schema.Literal('updateContainer'),
+    id: Schema.String,
+    name: Schema.String,
+    description: Schema.optional(Schema.String),
+  }),
   Schema.Struct({
     type: Schema.Literals(['trashContainer', 'restoreContainer', 'trashItem', 'restoreItem', 'exportItem']),
     id: Schema.String,

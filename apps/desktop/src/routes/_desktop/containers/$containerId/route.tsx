@@ -1,16 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Trash2 } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
-import { FileShelf } from '../../../components/file-shelf';
+import { FileShelf } from '../../../../components/file-shelf';
 import { ContainersPage } from '../-components/page';
-import { useContainerWorkspace } from '../../-utils/containers';
+import { useContainerWorkspace } from '../../../-utils/containers';
 
-export const Route = createFileRoute('/containers/$containerId')({ component: ContainerDetail });
+export const Route = createFileRoute('/_desktop/containers/$containerId')({ component: ContainerDetail });
 
 function ContainerDetail() {
   const { containerId } = Route.useParams();
-  const navigate = Route.useNavigate();
-  const { containers, trashContainer, isLoading, isWorking } = useContainerWorkspace();
+  const { containers, isLoading } = useContainerWorkspace();
   const selected = containers.find((container) => container.id === containerId && !container.deletedAt);
 
   if (isLoading) {
@@ -36,24 +34,7 @@ function ContainerDetail() {
   }
 
   return (
-    <ContainersPage
-      title={selected.name}
-      actions={
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Move container to trash"
-          disabled={isWorking}
-          onClick={async () => {
-            if (await trashContainer(selected.id)) {
-              void navigate({ to: '/containers', replace: true });
-            }
-          }}
-        >
-          <Trash2 className="text-muted-foreground" />
-        </Button>
-      }
-    >
+    <ContainersPage title={selected.name} subtitle={selected.description ?? null}>
       <FileShelf containerId={selected.id} />
     </ContainersPage>
   );

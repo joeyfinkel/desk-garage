@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('deskGarage', {
+  openMain: (containerId) => ipcRenderer.invoke('window:open-main', containerId),
+  hideQuick: () => ipcRenderer.send('window:hide-quick'),
   command: (command) => ipcRenderer.invoke('workspace:command', command),
   importDropped: (containerId, files) =>
     ipcRenderer.invoke('workspace:command', {

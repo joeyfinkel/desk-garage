@@ -3,6 +3,7 @@ import { Schema } from 'effect';
 export const Container = Schema.Struct({
   id: Schema.String,
   name: Schema.String,
+  description: Schema.optional(Schema.String),
   deletedAt: Schema.NullOr(Schema.String),
 });
 

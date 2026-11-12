@@ -1,4 +1,4 @@
-import { createResourceLayout } from '../../../../utils/layout';
+import { createResourceLayout } from '../../../../../utils/layout';
 
 export const CreateContainerPage = createResourceLayout({
   resource: 'containers',

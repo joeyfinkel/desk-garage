@@ -10,65 +10,111 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TrashRouteRouteImport } from './routes/trash/route'
-import { Route as ContainersIndexRouteImport } from './routes/containers/index'
-import { Route as ContainersContainerIdRouteRouteImport } from './routes/containers/$containerId/route'
-import { Route as ContainersNewRouteRouteImport } from './routes/containers/new/route'
+import { Route as DesktopRouteRouteImport } from './routes/_desktop/route'
+import { Route as QuickRouteRouteImport } from './routes/quick/route'
+import { Route as DesktopTrashRouteRouteImport } from './routes/_desktop/trash/route'
+import { Route as QuickIndexRouteImport } from './routes/quick/index'
+import { Route as QuickNewRouteRouteImport } from './routes/quick/new/route'
+import { Route as QuickTrashRouteRouteImport } from './routes/quick/trash/route'
+import { Route as DesktopContainersIndexRouteImport } from './routes/_desktop/containers/index'
+import { Route as DesktopContainersContainerIdRouteRouteImport } from './routes/_desktop/containers/$containerId/route'
+import { Route as DesktopContainersNewRouteRouteImport } from './routes/_desktop/containers/new/route'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TrashRouteRoute = TrashRouteRouteImport.update({
+const DesktopRouteRoute = DesktopRouteRouteImport.update({
+  id: '/_desktop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuickRouteRoute = QuickRouteRouteImport.update({
+  id: '/quick',
+  path: '/quick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesktopTrashRouteRoute = DesktopTrashRouteRouteImport.update({
   id: '/trash',
   path: '/trash',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => DesktopRouteRoute,
 } as any)
-const ContainersIndexRoute = ContainersIndexRouteImport.update({
+const QuickIndexRoute = QuickIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => QuickRouteRoute,
+} as any)
+const QuickNewRouteRoute = QuickNewRouteRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => QuickRouteRoute,
+} as any)
+const QuickTrashRouteRoute = QuickTrashRouteRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => QuickRouteRoute,
+} as any)
+const DesktopContainersIndexRoute = DesktopContainersIndexRouteImport.update({
   id: '/containers/',
   path: '/containers/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => DesktopRouteRoute,
 } as any)
-const ContainersContainerIdRouteRoute =
-  ContainersContainerIdRouteRouteImport.update({
+const DesktopContainersContainerIdRouteRoute =
+  DesktopContainersContainerIdRouteRouteImport.update({
     id: '/containers/$containerId',
     path: '/containers/$containerId',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => DesktopRouteRoute,
   } as any)
-const ContainersNewRouteRoute = ContainersNewRouteRouteImport.update({
-  id: '/containers/new',
-  path: '/containers/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const DesktopContainersNewRouteRoute =
+  DesktopContainersNewRouteRouteImport.update({
+    id: '/containers/new',
+    path: '/containers/new',
+    getParentRoute: () => DesktopRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/trash': typeof TrashRouteRoute
-  '/containers/$containerId': typeof ContainersContainerIdRouteRoute
-  '/containers/new': typeof ContainersNewRouteRoute
-  '/containers/': typeof ContainersIndexRoute
+  '/quick': typeof QuickRouteRouteWithChildren
+  '/trash': typeof DesktopTrashRouteRoute
+  '/quick/new': typeof QuickNewRouteRoute
+  '/quick/trash': typeof QuickTrashRouteRoute
+  '/quick/': typeof QuickIndexRoute
+  '/containers/$containerId': typeof DesktopContainersContainerIdRouteRoute
+  '/containers/new': typeof DesktopContainersNewRouteRoute
+  '/containers/': typeof DesktopContainersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/trash': typeof TrashRouteRoute
-  '/containers/$containerId': typeof ContainersContainerIdRouteRoute
-  '/containers/new': typeof ContainersNewRouteRoute
-  '/containers': typeof ContainersIndexRoute
+  '/trash': typeof DesktopTrashRouteRoute
+  '/quick/new': typeof QuickNewRouteRoute
+  '/quick/trash': typeof QuickTrashRouteRoute
+  '/quick': typeof QuickIndexRoute
+  '/containers/$containerId': typeof DesktopContainersContainerIdRouteRoute
+  '/containers/new': typeof DesktopContainersNewRouteRoute
+  '/containers': typeof DesktopContainersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/trash': typeof TrashRouteRoute
-  '/containers/$containerId': typeof ContainersContainerIdRouteRoute
-  '/containers/new': typeof ContainersNewRouteRoute
-  '/containers/': typeof ContainersIndexRoute
+  '/_desktop': typeof DesktopRouteRouteWithChildren
+  '/quick': typeof QuickRouteRouteWithChildren
+  '/_desktop/trash': typeof DesktopTrashRouteRoute
+  '/quick/new': typeof QuickNewRouteRoute
+  '/quick/trash': typeof QuickTrashRouteRoute
+  '/quick/': typeof QuickIndexRoute
+  '/_desktop/containers/$containerId': typeof DesktopContainersContainerIdRouteRoute
+  '/_desktop/containers/new': typeof DesktopContainersNewRouteRoute
+  '/_desktop/containers/': typeof DesktopContainersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/quick'
     | '/trash'
+    | '/quick/new'
+    | '/quick/trash'
+    | '/quick/'
     | '/containers/$containerId'
     | '/containers/new'
     | '/containers/'
@@ -76,24 +122,30 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/trash'
+    | '/quick/new'
+    | '/quick/trash'
+    | '/quick'
     | '/containers/$containerId'
     | '/containers/new'
     | '/containers'
   id:
     | '__root__'
     | '/'
-    | '/trash'
-    | '/containers/$containerId'
-    | '/containers/new'
-    | '/containers/'
+    | '/_desktop'
+    | '/quick'
+    | '/_desktop/trash'
+    | '/quick/new'
+    | '/quick/trash'
+    | '/quick/'
+    | '/_desktop/containers/$containerId'
+    | '/_desktop/containers/new'
+    | '/_desktop/containers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TrashRouteRoute: typeof TrashRouteRoute
-  ContainersContainerIdRouteRoute: typeof ContainersContainerIdRouteRoute
-  ContainersNewRouteRoute: typeof ContainersNewRouteRoute
-  ContainersIndexRoute: typeof ContainersIndexRoute
+  DesktopRouteRoute: typeof DesktopRouteRouteWithChildren
+  QuickRouteRoute: typeof QuickRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -105,43 +157,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trash': {
-      id: '/trash'
+    '/_desktop': {
+      id: '/_desktop'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DesktopRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quick': {
+      id: '/quick'
+      path: '/quick'
+      fullPath: '/quick'
+      preLoaderRoute: typeof QuickRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_desktop/trash': {
+      id: '/_desktop/trash'
       path: '/trash'
       fullPath: '/trash'
-      preLoaderRoute: typeof TrashRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DesktopTrashRouteRouteImport
+      parentRoute: typeof DesktopRouteRoute
     }
-    '/containers/': {
-      id: '/containers/'
+    '/quick/': {
+      id: '/quick/'
+      path: '/'
+      fullPath: '/quick/'
+      preLoaderRoute: typeof QuickIndexRouteImport
+      parentRoute: typeof QuickRouteRoute
+    }
+    '/quick/new': {
+      id: '/quick/new'
+      path: '/new'
+      fullPath: '/quick/new'
+      preLoaderRoute: typeof QuickNewRouteRouteImport
+      parentRoute: typeof QuickRouteRoute
+    }
+    '/quick/trash': {
+      id: '/quick/trash'
+      path: '/trash'
+      fullPath: '/quick/trash'
+      preLoaderRoute: typeof QuickTrashRouteRouteImport
+      parentRoute: typeof QuickRouteRoute
+    }
+    '/_desktop/containers/': {
+      id: '/_desktop/containers/'
       path: '/containers'
       fullPath: '/containers/'
-      preLoaderRoute: typeof ContainersIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DesktopContainersIndexRouteImport
+      parentRoute: typeof DesktopRouteRoute
     }
-    '/containers/$containerId': {
-      id: '/containers/$containerId'
+    '/_desktop/containers/$containerId': {
+      id: '/_desktop/containers/$containerId'
       path: '/containers/$containerId'
       fullPath: '/containers/$containerId'
-      preLoaderRoute: typeof ContainersContainerIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DesktopContainersContainerIdRouteRouteImport
+      parentRoute: typeof DesktopRouteRoute
     }
-    '/containers/new': {
-      id: '/containers/new'
+    '/_desktop/containers/new': {
+      id: '/_desktop/containers/new'
       path: '/containers/new'
       fullPath: '/containers/new'
-      preLoaderRoute: typeof ContainersNewRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DesktopContainersNewRouteRouteImport
+      parentRoute: typeof DesktopRouteRoute
     }
   }
 }
 
+interface DesktopRouteRouteChildren {
+  DesktopTrashRouteRoute: typeof DesktopTrashRouteRoute
+  DesktopContainersContainerIdRouteRoute: typeof DesktopContainersContainerIdRouteRoute
+  DesktopContainersNewRouteRoute: typeof DesktopContainersNewRouteRoute
+  DesktopContainersIndexRoute: typeof DesktopContainersIndexRoute
+}
+
+const DesktopRouteRouteChildren: DesktopRouteRouteChildren = {
+  DesktopTrashRouteRoute: DesktopTrashRouteRoute,
+  DesktopContainersContainerIdRouteRoute:
+    DesktopContainersContainerIdRouteRoute,
+  DesktopContainersNewRouteRoute: DesktopContainersNewRouteRoute,
+  DesktopContainersIndexRoute: DesktopContainersIndexRoute,
+}
+
+const DesktopRouteRouteWithChildren = DesktopRouteRoute._addFileChildren(
+  DesktopRouteRouteChildren,
+)
+
+interface QuickRouteRouteChildren {
+  QuickNewRouteRoute: typeof QuickNewRouteRoute
+  QuickTrashRouteRoute: typeof QuickTrashRouteRoute
+  QuickIndexRoute: typeof QuickIndexRoute
+}
+
+const QuickRouteRouteChildren: QuickRouteRouteChildren = {
+  QuickNewRouteRoute: QuickNewRouteRoute,
+  QuickTrashRouteRoute: QuickTrashRouteRoute,
+  QuickIndexRoute: QuickIndexRoute,
+}
+
+const QuickRouteRouteWithChildren = QuickRouteRoute._addFileChildren(
+  QuickRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TrashRouteRoute: TrashRouteRoute,
-  ContainersContainerIdRouteRoute: ContainersContainerIdRouteRoute,
-  ContainersNewRouteRoute: ContainersNewRouteRoute,
-  ContainersIndexRoute: ContainersIndexRoute,
+  DesktopRouteRoute: DesktopRouteRouteWithChildren,
+  QuickRouteRoute: QuickRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

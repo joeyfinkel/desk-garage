@@ -5,7 +5,7 @@ import { cn } from '@desk-garage/ui/cn';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 import { FileRow } from './file-row';
 
-export function FileShelf({ containerId }: { containerId: string }) {
+export function FileShelf({ containerId, showAddButton = false }: { containerId: string; showAddButton?: boolean }) {
   const { items, command, importDropped, isWorking } = useContainerWorkspace();
   const [isDragging, setIsDragging] = useState(false);
   const files = items.filter((item) => item.containerId === containerId && !item.deletedAt);
@@ -13,7 +13,10 @@ export function FileShelf({ containerId }: { containerId: string }) {
   return (
     <section
       aria-label="Container files"
-      className={cn('flex min-h-64 flex-1 flex-col gap-3 rounded-xl border border-dashed p-4', isDragging && 'border-primary bg-accent')}
+      className={cn(
+        'flex min-h-64 flex-1 flex-col gap-3',
+        isDragging && 'bg-accent outline-2 outline-dashed outline-primary outline-offset-4',
+      )}
       onDragOver={(event) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'copy';
@@ -35,19 +38,20 @@ export function FileShelf({ containerId }: { containerId: string }) {
     >
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-muted-foreground">
-          {files.length} {files.length === 1 ? 'file' : 'files'} · Drop files here to keep a copy
+          {files.length} {files.length === 1 ? 'file' : 'files'}
         </span>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={isWorking}
-          onClick={() => {
-            void command({ type: 'pickFiles', containerId });
-          }}
-        >
-          <FilePlus2 />
-          Add files
-        </Button>
+        {showAddButton && (
+          <Button
+            size="sm"
+            disabled={isWorking}
+            onClick={() => {
+              void command({ type: 'pickFiles', containerId });
+            }}
+          >
+            <FilePlus2 />
+            Add files
+          </Button>
+        )}
       </div>
       {isWorking && (
         <p role="status" className="text-xs text-muted-foreground">
