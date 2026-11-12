@@ -8,6 +8,7 @@ export const FileItem = Schema.Struct({
   size: Schema.Number,
   createdAt: Schema.String,
   deletedAt: Schema.NullOr(Schema.String),
+  body: Schema.optional(Schema.String),
 });
 export type FileItem = typeof FileItem.Type;
 export const Workspace = Schema.Struct({
@@ -33,6 +34,18 @@ export const WorkspaceCommand = Schema.Union([
   }),
   Schema.Struct({ type: Schema.Literal('importFiles'), containerId: Schema.String, paths: Schema.Array(Schema.String) }),
   Schema.Struct({ type: Schema.Literal('pickFiles'), containerId: Schema.String }),
+  Schema.Struct({
+    type: Schema.Literal('createNote'),
+    containerId: Schema.String,
+    name: Schema.optional(Schema.String),
+    body: Schema.String,
+  }),
+  Schema.Struct({
+    type: Schema.Literal('updateNote'),
+    id: Schema.String,
+    name: Schema.optional(Schema.String),
+    body: Schema.String,
+  }),
 ]);
 export type WorkspaceCommand = typeof WorkspaceCommand.Type;
 

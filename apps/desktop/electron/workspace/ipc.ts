@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, ipcMain, nativeImage } from 'electron';
-import { copyFile } from 'node:fs/promises';
+import { copyFile, writeFile } from 'node:fs/promises';
 import { Effect, Result, Schema } from 'effect';
 import { WorkspaceCommand, WorkspaceError, type WorkspaceResponse } from '@desk-garage/workspace';
 import { getTrustedWindow } from '../trusted-window';
@@ -30,7 +30,11 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
   ipcMain.handle('workspace:command', async (event, input: unknown): Promise<WorkspaceResponse> => {
     try {
       const window = getTrustedWindow(event);
-      const command = await Effect.runPromise(Schema.decodeUnknownEffect(WorkspaceCommand)(input));
+      const command = await Effect.runPromise(
+        Schema.decodeUnknownEffect(WorkspaceCommand)(input).pipe(
+          Effect.mapError((cause) => new WorkspaceError({ message: 'This action is not available. Restart DeskGarage and try again.', cause })),
+        ),
+      );
       let operation;
 
       if (command.type === 'pickFiles') {
@@ -48,7 +52,11 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
         const result = await withDialog(window, () => dialog.showSaveDialog(window, { title: 'Save a copy', defaultPath: file.item.name }));
 
         if (!result.canceled && result.filePath) {
-          await copyFile(file.path, result.filePath);
+          if (file.item.body != null) {
+            await writeFile(result.filePath, file.item.body);
+          } else if (file.path) {
+            await copyFile(file.path, result.filePath);
+          }
         }
 
         operation = store.execute({ type: 'load' });
@@ -86,7 +94,7 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
 
     void Effect.runPromise(store.fileForItem(input))
       .then(({ path }) => {
-        if (!event.sender.isDestroyed()) {
+        if (path && !event.sender.isDestroyed()) {
           event.sender.startDrag({ file: path, icon: nativeImage.createFromPath(dragIconPath).resize({ width: 32, height: 32 }) });
         }
       })

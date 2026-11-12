@@ -143,6 +143,58 @@ export function createWorkspaceStore(root: string) {
           return yield* new WorkspaceError({ message: 'This action requires the native file dialog.' });
         }
 
+        if (command.type === 'createNote' || command.type === 'updateNote') {
+          const body = command.body.replace(/\r\n/g, '\n');
+          const name = (command.name?.trim() || body.trim().split('\n')[0] || 'Note').slice(0, 80);
+
+          if (body.length > 20000) {
+            return yield* new WorkspaceError({ message: 'Notes can be up to 20,000 characters.' });
+          }
+
+          if (command.type === 'createNote') {
+            if (!workspace.containers.some((container) => container.id === command.containerId && !container.deletedAt)) {
+              return yield* new WorkspaceError({ message: 'Choose an active container before adding a note.' });
+            }
+
+            const next = {
+              ...workspace,
+              revision: workspace.revision + 1,
+              items: [
+                ...workspace.items,
+                {
+                  id: randomUUID(),
+                  containerId: command.containerId,
+                  name,
+                  body,
+                  size: Buffer.byteLength(body),
+                  createdAt: new Date().toISOString(),
+                  deletedAt: null,
+                },
+              ],
+            };
+            yield* save(next);
+
+            return next;
+          }
+
+          const current = workspace.items.find((item) => item.id === command.id && item.body != null && !item.deletedAt);
+
+          if (!current || !workspace.containers.some((container) => container.id === current.containerId && !container.deletedAt)) {
+            return yield* new WorkspaceError({ message: 'This note is unavailable or in the trash.' });
+          }
+
+          const next = {
+            ...workspace,
+            revision: workspace.revision + 1,
+            items: workspace.items.map((item) =>
+              item.id === command.id ? { ...item, name, body, size: Buffer.byteLength(body) } : item,
+            ),
+          };
+          yield* save(next);
+
+          return next;
+        }
+
         if (command.type === 'updateContainer' || command.type === 'createContainer') {
           const name = command.name.trim();
           const description = command.description?.trim() || undefined;
@@ -237,8 +289,16 @@ export function createWorkspaceStore(root: string) {
           return yield* new WorkspaceError({ message: 'Restore this file and its container before exporting it.' });
         }
 
+        if (!/^[a-f0-9-]{36}$/.test(item.id)) {
+          return yield* new WorkspaceError({ message: 'The saved file location is invalid.' });
+        }
+
+        if (item.body != null) {
+          return { item, path: undefined };
+        }
+
         // Use only metadata written by the store, and reject unsafe metadata if the file was edited externally.
-        if (['.', '..'].includes(item.name) || basename(item.name) !== item.name || !/^[a-f0-9-]{36}$/.test(item.id)) {
+        if (['.', '..'].includes(item.name) || basename(item.name) !== item.name) {
           return yield* new WorkspaceError({ message: 'The saved file location is invalid.' });
         }
 

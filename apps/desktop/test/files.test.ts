@@ -64,7 +64,7 @@ describe('native file storage', () => {
     await rm(original);
     const restarted = createWorkspaceStore(join(root, 'garage'));
     const file = await Effect.runPromise(restarted.fileForItem(item.id));
-    expect(await readFile(file.path)).toEqual(contents);
+    expect(await readFile(file.path ?? '')).toEqual(contents);
     expect((await Effect.runPromise(restarted.execute({ type: 'load' }))).items).toHaveLength(1);
   });
 
@@ -79,7 +79,7 @@ describe('native file storage', () => {
       next.items.map(async (item) => {
         const file = await Effect.runPromise(store.fileForItem(item.id));
 
-        return readFile(file.path, 'utf8');
+        return readFile(file.path ?? '', 'utf8');
       }),
     );
     expect(values).toEqual(['first', 'second']);
@@ -117,7 +117,7 @@ describe('native file storage', () => {
     expect((await Effect.runPromise(store.execute({ type: 'load' }))).items[0]?.deletedAt).not.toBeNull();
     await Effect.runPromise(store.execute({ type: 'restoreItem', id }));
     const file = await Effect.runPromise(store.fileForItem(id));
-    expect(await readFile(file.path, 'utf8')).toBe('kept');
+    expect(await readFile(file.path ?? '', 'utf8')).toBe('kept');
   });
 
   it('migrates legacy containers once and serializes concurrent changes', async () => {
@@ -155,5 +155,20 @@ describe('native file storage', () => {
         await Effect.runPromise(store.execute({ type: 'importFiles', containerId: 'everyday', paths: [folder] }).pipe(Effect.result)),
       ),
     ).toBe(true);
+  });
+
+  it('keeps a note as text that can be renamed and read again', async () => {
+    const { store } = await setup();
+    const created = await Effect.runPromise(
+      store.execute({ type: 'createNote', containerId: 'everyday', body: 'alex@example.com' }),
+    );
+    expect(created.items.at(-1)).toMatchObject({ name: 'alex@example.com', body: 'alex@example.com' });
+    const id = created.items.at(-1)?.id ?? '';
+    const updated = await Effect.runPromise(store.execute({ type: 'updateNote', id, name: 'Alex', body: 'alex@example.com' }));
+    expect(updated.items.find((item) => item.id === id)).toMatchObject({ name: 'Alex', body: 'alex@example.com' });
+    const loaded = await Effect.runPromise(store.execute({ type: 'load' }));
+    expect(loaded.items.find((item) => item.id === id)?.body).toBe('alex@example.com');
+    const empty = await Effect.runPromise(store.execute({ type: 'createNote', containerId: 'everyday', body: '' }));
+    expect(empty.items.at(-1)).toMatchObject({ name: 'Note', body: '' });
   });
 });
