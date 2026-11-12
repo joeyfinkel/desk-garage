@@ -51,6 +51,7 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
+        backgroundThrottling: !isQuick,
         preload: fileURLToPath(new URL('../electron/preload.cjs', import.meta.url)),
       },
     });
@@ -109,11 +110,34 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
     }
   }
 
+  function ensureQuick() {
+    if (quick && !quick.isDestroyed()) {
+      return quick;
+    }
+
+    quick = makeWindow(true);
+    quick.on('blur', () => {
+      if (quick && !hasDialog(quick)) {
+        hiddenAt = Date.now();
+        quick.hide();
+      }
+    });
+    quick.webContents.on('before-input-event', (_event, input) => {
+      if (input.key === 'Escape') {
+        quick?.hide();
+      }
+    });
+    void load(quick, '/quick');
+
+    return quick;
+  }
+
   function showQuick(tray: Tray) {
     noteStatusItemClick();
+    const panel = ensureQuick();
 
-    if (quick?.isVisible()) {
-      quick.hide();
+    if (panel.isVisible()) {
+      panel.hide();
 
       return;
     }
@@ -123,33 +147,15 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
       return;
     }
 
-    if (!quick || quick.isDestroyed()) {
-      quick = makeWindow(true);
-      quick.on('blur', () => {
-        if (quick && !hasDialog(quick)) {
-          hiddenAt = Date.now();
-          quick.hide();
-        }
-      });
-      quick.webContents.on('before-input-event', (_event, input) => {
-        if (input.key === 'Escape') {
-          quick?.hide();
-        }
-      });
-      quick.once('ready-to-show', () => {
-        quick?.show();
-        quick?.focus();
-      });
-      void load(quick, '/quick');
-    }
-
     const anchor = tray.getBounds();
-    quick.setBounds(positionTrayPanel(anchor, screen.getDisplayMatching(anchor).workArea));
+    panel.setBounds(positionTrayPanel(anchor, screen.getDisplayMatching(anchor).workArea));
 
-    if (!quick.webContents.isLoading()) {
-      quick.show();
-      quick.focus();
+    if (panel.webContents.isCrashed()) {
+      void load(panel, '/quick');
     }
+
+    panel.show();
+    panel.focus();
   }
 
   function noteStatusItemClick() {
@@ -184,6 +190,8 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
       showMain();
     }, STATUS_ITEM_ACTIVATE_GRACE_MS);
   }
+
+  ensureQuick();
 
   return { showMain, showQuick, activate, noteStatusItemClick };
 }
