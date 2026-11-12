@@ -131,7 +131,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "f85252a527418023b0390bdb6e0381a9ed9bae80e127baa0b7f3ca94ec2279ab"
+      "sha256": "e65105c80900898b4104ce20794b18f0f376b415a0b68a82b1baa5c5bbf920f0"
     },
     {
       "path": ".gitignore",
@@ -145,7 +145,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "6b8ec320d31b1facfbcd25295744e7459355c8c353e7ecb3027ad4838e861d7b"
+      "sha256": "a95c61b303cbf0f2dc1f78f4aadc64c68794b20d1736606e8cc3f0a8adb790a4"
     },
     {
       "path": "apps/web/README.md",
@@ -215,7 +215,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "5bbb75d001920551b931faf2eec2025d31359fe71656f2f2ae12a52b476249d8"
+      "sha256": "c6d9f63e516e098cbcac16618dd011c51b9137bb7efe1f94e2a5a8118974a936"
     },
     {
       "path": "pnpm-workspace.yaml",

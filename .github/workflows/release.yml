@@ -33,11 +33,68 @@ jobs:
           node-version: "24"
           cache: true
 
-      - name: Prepare the release
+      - name: Version packages
         id: release
         env:
-          RELEASE_CHANNEL: ${{ github.event.pull_request.base.ref == 'main' && 'stable' || github.event.pull_request.base.ref }}
-        run: node scripts/prepare-release.mjs
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          channel="$BASE_REF"
+          if [[ "$channel" == "main" ]]; then
+            channel="stable"
+          fi
+
+          changeset_count=0
+          for file in .changeset/*.md; do
+            if [[ "$(basename "$file")" != "README.md" ]]; then
+              changeset_count=$((changeset_count + 1))
+            fi
+          done
+
+          if [[ "$changeset_count" -eq 0 ]]; then
+            {
+              echo "publish=false"
+              echo "version="
+              echo "tag="
+              echo "prerelease=false"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$channel" == "stable" ]]; then
+            if [[ -f .changeset/pre.json ]]; then
+              pnpm exec changeset pre exit
+            fi
+          elif [[ -f .changeset/pre.json ]]; then
+            tag="$(node -e "process.stdout.write(require('./.changeset/pre.json').tag)")"
+            if [[ "$tag" != "$channel" ]]; then
+              pnpm exec changeset pre exit
+              pnpm exec changeset pre enter "$channel"
+            fi
+          else
+            pnpm exec changeset pre enter "$channel"
+          fi
+
+          before="$(node -e "process.stdout.write(require('./apps/desktop/package.json').version)")"
+          pnpm exec changeset version
+          after="$(node -e "process.stdout.write(require('./apps/desktop/package.json').version)")"
+          publish=false
+          prerelease=false
+          tag=""
+          if [[ "$before" != "$after" ]]; then
+            publish=true
+            tag="v$after"
+            if [[ "$after" == *-* ]]; then
+              prerelease=true
+            fi
+          fi
+          {
+            echo "publish=$publish"
+            echo "version=$after"
+            echo "tag=$tag"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build the desktop app
         if: steps.release.outputs.publish == 'true'
@@ -55,9 +112,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json apps/desktop/package.json apps/web/package.json packages/containers/package.json packages/theme/package.json packages/ui/package.json packages/workspace/package.json
-          if [[ -d .changes ]]; then
-            git add -A -- .changes
+          git add .changeset package.json apps packages
+          if git diff --cached --quiet; then
+            exit 0
           fi
           tag="${{ steps.release.outputs.tag }}"
           message="chore(release): prepare ${tag}"
@@ -76,7 +133,7 @@ jobs:
             release create "${{ steps.release.outputs.tag }}"
             --target "$(git rev-parse HEAD)"
             --title "DeskGarage ${{ steps.release.outputs.version }}"
-            --notes-file release-notes.md
+            --notes-file apps/desktop/CHANGELOG.md
           )
           if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
             args+=(--prerelease)
