@@ -43,6 +43,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Test release versions
+        run: node --test scripts/release-version.test.mjs
+
       - name: Check formatting
         run: pnpm format:check
 

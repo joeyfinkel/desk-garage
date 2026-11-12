@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - alpha
+      - beta
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Prepare the release
+        id: release
+        env:
+          RELEASE_CHANNEL: ${{ github.ref_name == 'main' && 'stable' || github.ref_name }}
+        run: node scripts/prepare-release.mjs
+
+      - name: Build the desktop app
+        run: pnpm --filter desk-garage-desktop build
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Package the Mac download
+        run: pnpm --filter desk-garage-desktop package
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Commit the version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json apps/desktop/package.json apps/web/package.json packages/containers/package.json packages/theme/package.json packages/ui/package.json packages/workspace/package.json
+          if [[ -d .changes ]]; then
+            git add -A -- .changes
+          fi
+          git commit -m "chore(release): prepare ${{ steps.release.outputs.tag }}"
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=(
+            release create "${{ steps.release.outputs.tag }}"
+            --target "$(git rev-parse HEAD)"
+            --title "DeskGarage ${{ steps.release.outputs.version }}"
+            --notes-file release-notes.md
+          )
+          if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          gh "${args[@]}" apps/desktop/release/*.zip

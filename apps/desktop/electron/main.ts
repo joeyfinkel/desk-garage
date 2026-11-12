@@ -18,6 +18,11 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 app.setName('DeskGarage');
+app.setAboutPanelOptions({
+  applicationName: 'DeskGarage',
+  applicationVersion: app.getVersion(),
+  version: '',
+});
 app.on('window-all-closed', () => {});
 
 if (process.platform === 'darwin') {

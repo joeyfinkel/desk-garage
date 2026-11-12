@@ -1,0 +1,20 @@
+appId: com.deskgarage.app
+productName: DeskGarage
+directories:
+  output: release
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - electron/preload.cjs
+  - electron/tray.png
+  - electron/tray@2x.png
+  - electron/dock-icon.png
+  - electron/icon.png
+  - electron/icon.icns
+mac:
+  icon: electron/icon.icns
+  category: public.app-category.productivity
+  target:
+    - zip
+  identity: null
+artifactName: DeskGarage-${version}-${arch}.${ext}
