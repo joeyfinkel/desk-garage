@@ -1,7 +1,8 @@
 name: Release
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - alpha
       - beta
@@ -11,18 +12,19 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref_name }}
+  group: release-${{ github.event.pull_request.base.ref }}
   cancel-in-progress: false
 
 jobs:
   release:
     name: Release
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
           persist-credentials: true
 
@@ -34,7 +36,7 @@ jobs:
       - name: Prepare the release
         id: release
         env:
-          RELEASE_CHANNEL: ${{ github.ref_name == 'main' && 'stable' || github.ref_name }}
+          RELEASE_CHANNEL: ${{ github.event.pull_request.base.ref == 'main' && 'stable' || github.event.pull_request.base.ref }}
         run: node scripts/prepare-release.mjs
 
       - name: Build the desktop app
@@ -56,7 +58,7 @@ jobs:
             git add -A -- .changes
           fi
           git commit -m "chore(release): prepare ${{ steps.release.outputs.tag }}"
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}
 
       - name: Publish the GitHub release
         env:

@@ -65,7 +65,7 @@ GitHub Actions runs that sequence on every push and pull request. The build step
 
 ## Releases
 
-The release channel is the branch a pull request targets. Merging into `alpha` publishes an alpha, merging into `beta` publishes a beta, and merging into `main` publishes a stable version. The bump is chosen in the pull request. Run `pnpm changeset`, pick patch, minor, or major, and write the note. That writes a file under `.changes/` whose first line is the bump:
+The release channel is the branch a pull request targets. The release runs only after that pull request is merged. Merging into `alpha` publishes an alpha, merging into `beta` publishes a beta, and merging into `main` publishes a stable version. A direct push does not publish. The bump is chosen in the pull request. Run `pnpm changeset`, pick patch, minor, or major, and write the note. That writes a file under `.changes/` whose first line is the bump:
 
 ```md
 minor
