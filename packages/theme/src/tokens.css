@@ -2,6 +2,8 @@
   --background: #f7f7f4;
   --foreground: #242923;
   --card: #ffffff;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
   --primary: #365a40;
   --primary-foreground: #ffffff;
   --secondary: #e9ece5;
