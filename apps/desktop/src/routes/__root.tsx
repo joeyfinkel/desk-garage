@@ -17,7 +17,11 @@ function RootRoute() {
   return (
     <ContainersContext.Provider value={workspace}>
       <div className="desktop-drag-region fixed inset-x-0 top-0 z-50 h-8" />
-      <SidebarProvider className="min-h-[calc(100svh-2rem)] pt-8">
+      <SidebarProvider
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => event.preventDefault()}
+        className="min-h-[calc(100svh-2rem)] pt-8"
+      >
         <WorkspaceSidebar />
         <SidebarInset>
           <div className="px-6 pt-2">

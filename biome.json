@@ -10,7 +10,8 @@
       "!yarn.lock",
       "!bun.lock",
       "!**/dist/**",
-      "!**/route-tree.gen.ts"
+      "!**/route-tree.gen.ts",
+      "!**/dist-electron/**"
     ]
   },
   "formatter": {

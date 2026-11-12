@@ -1,9 +1,15 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'vite-plus';
 import electron from 'electron';
 
 if (!process.env.PORTLESS_URL || !process.env.PORT) {
   throw new Error('Start the desktop app with pnpm dev from the workspace root (Portless is required).');
+}
+
+const nativeBuild = spawnSync('pnpm', ['exec', 'vp', 'pack'], { stdio: 'inherit' });
+
+if (nativeBuild.status !== 0) {
+  process.exit(nativeBuild.status ?? 1);
 }
 
 const server = await createServer();

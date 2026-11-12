@@ -1,53 +1,98 @@
-import { useState } from 'react';
-import { Result } from 'effect';
-import { addContainer as add, loadContainers, restoreContainer as restore, trashContainer as trash } from '@desk-garage/containers';
-import { runContainerOperation } from './services/containers';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Effect, Result } from 'effect';
+import { type Workspace, type WorkspaceCommand, WorkspaceError } from '@desk-garage/workspace';
+import { decodeWorkspaceResponse, runWorkspaceCommand } from './services/containers';
+
+const emptyWorkspace: Workspace = { version: 1, revision: -1, containers: [], items: [] };
 
 export function useContainers() {
-  const [state, setState] = useState(() => {
-    const result = runContainerOperation(loadContainers);
+  const [state, setState] = useState({ workspace: emptyWorkspace, storageError: '', isLoading: true, pending: 0 });
+  const isMounted = useRef(true);
 
-    return Result.match(result, {
-      onSuccess: (containers) => ({ containers, storageError: '' }),
-      onFailure: (error) => ({ containers: [], storageError: error.message }),
-    });
-  });
+  const run = useCallback(async (operation: Effect.Effect<Workspace, WorkspaceError>) => {
+    setState((current) => ({ ...current, pending: current.pending + 1 }));
+    const result = await Effect.runPromise(operation.pipe(Effect.result));
 
-  function addContainer(name: string) {
-    const result = runContainerOperation(add(name));
+    if (!isMounted.current) {
+      return undefined;
+    }
 
     if (Result.isFailure(result)) {
-      setState((current) => ({ ...current, storageError: result.failure.message }));
+      setState((current) => ({ ...current, storageError: result.failure.message, isLoading: false, pending: current.pending - 1 }));
 
       return undefined;
     }
 
-    setState({ containers: result.success.containers, storageError: '' });
+    setState((current) => ({
+      workspace: result.success.revision >= current.workspace.revision ? result.success : current.workspace,
+      storageError: '',
+      isLoading: false,
+      pending: current.pending - 1,
+    }));
 
-    return result.success.id;
+    return result.success;
+  }, []);
+
+  useEffect(() => {
+    isMounted.current = true;
+    const initial = Effect.try({
+      try: () => localStorage.getItem('desk-garage:containers:v1'),
+      catch: (cause) => new WorkspaceError({ message: 'Existing local containers could not be read for migration.', cause }),
+    }).pipe(Effect.flatMap((legacyContainers) => runWorkspaceCommand({ type: 'load', legacyContainers })));
+    void run(initial);
+    const unsubscribe = window.deskGarage?.onChanged(() => {
+      void run(runWorkspaceCommand({ type: 'load' }));
+    });
+
+    return () => {
+      isMounted.current = false;
+      unsubscribe?.();
+    };
+  }, [run]);
+
+  function command(command: WorkspaceCommand) {
+    return run(runWorkspaceCommand(command));
   }
 
-  function changeContainer(id: string, operation: typeof trash) {
-    const result = runContainerOperation(operation(id));
+  async function addContainer(name: string) {
+    const next = await command({ type: 'createContainer', name });
 
-    if (Result.isFailure(result)) {
-      setState((current) => ({ ...current, storageError: result.failure.message }));
-
-      return false;
-    }
-
-    setState({ containers: result.success, storageError: '' });
-
-    return true;
+    return next?.containers.at(-1)?.id;
   }
 
-  function trashContainer(id: string) {
-    return changeContainer(id, trash);
+  async function trashContainer(id: string) {
+    return !!(await command({ type: 'trashContainer', id }));
   }
 
   function restoreContainer(id: string) {
-    return changeContainer(id, restore);
+    return command({ type: 'restoreContainer', id });
   }
 
-  return { ...state, addContainer, trashContainer, restoreContainer };
+  function importDropped(containerId: string, files: File[]) {
+    const operation = Effect.tryPromise({
+      try: async () => {
+        if (!window.deskGarage) {
+          throw new Error('The desktop connection is unavailable.');
+        }
+
+        return window.deskGarage.importDropped(containerId, files);
+      },
+      catch: (cause) => new WorkspaceError({ message: 'These files could not be imported. Please try the file picker.', cause }),
+    }).pipe(Effect.flatMap(decodeWorkspaceResponse));
+
+    return run(operation);
+  }
+
+  return {
+    containers: state.workspace.containers,
+    items: state.workspace.items,
+    storageError: state.storageError,
+    isLoading: state.isLoading,
+    isWorking: state.pending > 0,
+    addContainer,
+    trashContainer,
+    restoreContainer,
+    command,
+    importDropped,
+  };
 }

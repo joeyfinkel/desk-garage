@@ -7,8 +7,16 @@ import { ContainersPage } from './-components/page';
 export const Route = createFileRoute('/containers/')({ component: ContainersIndex });
 
 function ContainersIndex() {
-  const { containers } = useContainerWorkspace();
+  const { containers, isLoading } = useContainerWorkspace();
   const first = containers.find((container) => !container.deletedAt);
+
+  if (isLoading) {
+    return (
+      <ContainersPage title="Your garage">
+        <p role="status">Loading containers…</p>
+      </ContainersPage>
+    );
+  }
 
   if (first) {
     return <Navigate to="/containers/$containerId" params={{ containerId: first.id }} replace />;

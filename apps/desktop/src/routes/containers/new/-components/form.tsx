@@ -7,15 +7,15 @@ import { useContainerWorkspace } from '../../../-utils/containers';
 
 export function CreateContainerForm() {
   const [name, setName] = useState('');
-  const { addContainer } = useContainerWorkspace();
+  const { addContainer, isWorking } = useContainerWorkspace();
   const navigate = useNavigate();
 
   return (
     <form
       className="max-w-md rounded-xl border bg-card p-6"
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
-        const id = addContainer(name);
+        const id = await addContainer(name);
 
         if (id) {
           void navigate({ to: '/containers/$containerId', params: { containerId: id }, replace: true });
@@ -39,7 +39,7 @@ export function CreateContainerForm() {
         Only available on this device. You can organize your files here as the garage grows.
       </p>
       <div className="mt-6 flex gap-2">
-        <Button type="submit" disabled={!name.trim()}>
+        <Button type="submit" disabled={!name.trim() || isWorking}>
           <Plus />
           Create container
         </Button>

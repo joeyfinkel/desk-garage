@@ -58,6 +58,9 @@ importers:
       '@desk-garage/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@desk-garage/workspace':
+        specifier: workspace:*
+        version: link:../../packages/workspace
       '@jfdevelops/react-layout':
         specifier: ^2.7.0
         version: 2.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -183,6 +186,15 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.0
         version: 19.3.0(@types/react@19.3.0)
+
+  packages/workspace:
+    dependencies:
+      '@desk-garage/containers':
+        specifier: workspace:*
+        version: link:../containers
+      effect:
+        specifier: ^4.1.4
+        version: 4.1.4
 
 packages:
 

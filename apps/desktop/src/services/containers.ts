@@ -1,26 +1,24 @@
-import { Effect } from 'effect';
-import { ContainerError, ContainerStorage } from '@desk-garage/containers';
+import { Effect, Schema } from 'effect';
+import { type WorkspaceCommand, WorkspaceError, WorkspaceResponse } from '@desk-garage/workspace';
 
-const storageKey = 'desk-garage:containers:v1';
-const storage = ContainerStorage.of({
-  read: Effect.try({
-    try: () => localStorage.getItem(storageKey),
-    catch: (cause) =>
-      new ContainerError({ operation: 'read', message: 'Local storage is unavailable. Your containers could not be loaded.', cause }),
-  }),
-  write: (value) =>
-    Effect.try({
-      try: () => localStorage.setItem(storageKey, value),
-      catch: (cause) =>
-        new ContainerError({ operation: 'write', message: 'Your changes could not be saved on this device. Please try again.', cause }),
-    }),
-  createId: Effect.try({
-    try: () => crypto.randomUUID(),
-    catch: (cause) => new ContainerError({ operation: 'create', message: 'A container ID could not be created. Please try again.', cause }),
-  }),
-});
+export function decodeWorkspaceResponse(response: unknown) {
+  return Schema.decodeUnknownEffect(WorkspaceResponse)(response).pipe(
+    Effect.mapError((cause) => new WorkspaceError({ message: 'The desktop returned an invalid response.', cause })),
+    Effect.flatMap((response) =>
+      response.ok ? Effect.succeed(response.value) : Effect.fail(new WorkspaceError({ message: response.error })),
+    ),
+  );
+}
 
-// The current local-storage adapter is synchronous. Interpret effects only at this UI boundary.
-export function runContainerOperation<A>(operation: Effect.Effect<A, ContainerError, ContainerStorage>) {
-  return Effect.runSync(operation.pipe(Effect.provideService(ContainerStorage, storage), Effect.result));
+export function runWorkspaceCommand(command: WorkspaceCommand) {
+  return Effect.tryPromise({
+    try: async () => {
+      if (!window.deskGarage) {
+        throw new Error('The native desktop connection is unavailable.');
+      }
+
+      return window.deskGarage.command(command);
+    },
+    catch: (cause) => new WorkspaceError({ message: 'The desktop connection is unavailable. Restart DeskGarage and try again.', cause }),
+  }).pipe(Effect.flatMap(decodeWorkspaceResponse));
 }

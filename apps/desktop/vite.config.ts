@@ -7,6 +7,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   base: './',
+  pack: {
+    entry: ['electron/main.ts'],
+    outDir: 'dist-electron',
+    format: 'esm',
+    dts: false,
+    deps: { neverBundle: ['electron'], alwaysBundle: [/^@desk-garage\//] },
+  },
   plugins: [
     devtools(),
     reactLayoutDevtools(),

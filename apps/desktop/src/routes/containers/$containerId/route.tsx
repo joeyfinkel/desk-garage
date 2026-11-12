@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
-import { EmptyContainer } from './-components/empty';
+import { FileShelf } from '../../../components/file-shelf';
 import { ContainersPage } from '../-components/page';
 import { useContainerWorkspace } from '../../-utils/containers';
 
@@ -10,8 +10,16 @@ export const Route = createFileRoute('/containers/$containerId')({ component: Co
 function ContainerDetail() {
   const { containerId } = Route.useParams();
   const navigate = Route.useNavigate();
-  const { containers, trashContainer } = useContainerWorkspace();
+  const { containers, trashContainer, isLoading, isWorking } = useContainerWorkspace();
   const selected = containers.find((container) => container.id === containerId && !container.deletedAt);
+
+  if (isLoading) {
+    return (
+      <ContainersPage title="Your garage">
+        <p role="status">Loading container…</p>
+      </ContainersPage>
+    );
+  }
 
   if (!selected) {
     return (
@@ -35,8 +43,9 @@ function ContainerDetail() {
           variant="ghost"
           size="icon"
           aria-label="Move container to trash"
-          onClick={() => {
-            if (trashContainer(selected.id)) {
+          disabled={isWorking}
+          onClick={async () => {
+            if (await trashContainer(selected.id)) {
               void navigate({ to: '/containers', replace: true });
             }
           }}
@@ -45,7 +54,7 @@ function ContainerDetail() {
         </Button>
       }
     >
-      <EmptyContainer />
+      <FileShelf containerId={selected.id} />
     </ContainersPage>
   );
 }

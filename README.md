@@ -7,6 +7,7 @@ A private home for the files, links, and snippets you reach for often.
 - `apps/desktop`: Electron + React desktop app, shared by macOS and Windows.
 - `apps/web`: existing website placeholder.
 - `packages/containers`: Effect schemas, typed errors, storage service, and container operations.
+- `packages/workspace`: shared workspace/file schemas, bridge contracts, and typed errors.
 - `packages/ui`: shadcn components, `cn`, and shared Tailwind styles.
 - `packages/theme`: framework-independent CSS theme tokens.
 
@@ -24,7 +25,7 @@ Route-private components and utilities use `-components` and `-utils` directorie
 
 ## Application runtime
 
-Use Effect for application services, asynchronous workflows, resource lifecycles, and typed errors as the app grows. Keep React components focused on presentation and local interaction state. Shared services belong in workspace packages; platform-specific adapters stay with their app. Container persistence and create/trash/restore workflows use Effect 4. The desktop supplies a local-storage adapter and interprets synchronous effects at the React boundary. Mutations update the UI only after persistence succeeds; invalid stored data is reported without overwriting it.
+Use Effect for application services, asynchronous workflows, resource lifecycles, and typed errors as the app grows. Keep React components focused on presentation and local interaction state. Shared services belong in workspace packages; platform-specific adapters stay with their app. Container persistence and create/trash/restore workflows use Effect 4. The native desktop process owns disk storage and serializes workspace operations with an Effect semaphore. A sandboxed preload exposes a narrow, validated command bridge. React interprets Effect results at the UI boundary. Mutations update the UI only after persistence succeeds; invalid stored data is reported without overwriting it.
 
 ## Develop on macOS
 
@@ -39,7 +40,11 @@ The development command starts the renderer through Portless and opens Electron 
 
 Closing the window keeps DeskGarage in the menu bar. Use the tray menu to reopen or quit it. Stop `pnpm dev` to stop the development session.
 
-The foundation supports creating private containers, moving them to trash, and restoring them. Container metadata is stored locally in Electron's browser profile. File import, item management, permanent deletion, sync, authentication, mobile, and distribution packaging are upcoming work. This is a development app, not a packaged release.
+Private containers support file import through the native picker or drag and drop (up to 100 regular files per batch). Files are copied into `app.getPath('userData')/workspace/files`; atomic metadata updates live in `workspace/workspace.json`. Imports never move the originals or load entire files into the renderer. Existing browser-stored containers migrate once, retaining their original browser-storage backup.
+
+Drag a saved file out or use **Save a copy** to export it. Removing a file moves it to recoverable trash. Removing a container hides its files together; restoring it preserves any files that were already individually trashed. Restore a container before recovering its individually trashed files. Permanent deletion, sync, authentication, mobile, and distribution packaging are upcoming work.
+
+`pnpm dev` builds the native TypeScript entry before opening Electron. Restart it after main-process or preload edits. Renderer edits hot reload through Portless.
 
 ## Development tools
 
