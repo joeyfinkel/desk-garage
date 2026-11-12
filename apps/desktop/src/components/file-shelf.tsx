@@ -4,10 +4,12 @@ import { Button } from '@desk-garage/ui/button';
 import { cn } from '@desk-garage/ui/cn';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 import { FileRow } from './file-row';
+import { ScreenMessage } from './screen-message';
 
 export function FileShelf({ containerId, showAddButton = false }: { containerId: string; showAddButton?: boolean }) {
-  const { items, command, importDropped, isWorking } = useContainerWorkspace();
+  const { containers, items, command, importDropped, isWorking } = useContainerWorkspace();
   const [isDragging, setIsDragging] = useState(false);
+  const name = containers.find((container) => container.id === containerId)?.name;
   const files = items.filter((item) => item.containerId === containerId && !item.deletedAt);
 
   return (
@@ -36,24 +38,26 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
         }
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs text-muted-foreground">
-          {files.length} {files.length === 1 ? 'file' : 'files'}
-        </span>
-        {showAddButton && (
-          <Button
-            size="sm"
-            disabled={isWorking}
-            onClick={() => {
-              void command({ type: 'pickFiles', containerId });
-            }}
-          >
-            <FilePlus2 />
-            Add files
-          </Button>
-        )}
-      </div>
-      {isWorking && (
+      {files.length > 0 && (
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">
+            {files.length} {files.length === 1 ? 'file' : 'files'}
+          </span>
+          {showAddButton && (
+            <Button
+              size="sm"
+              disabled={isWorking}
+              onClick={() => {
+                void command({ type: 'pickFiles', containerId });
+              }}
+            >
+              <FilePlus2 />
+              Add files
+            </Button>
+          )}
+        </div>
+      )}
+      {isWorking && files.length > 0 && (
         <p role="status" className="text-xs text-muted-foreground">
           Saving changes…
         </p>
@@ -61,13 +65,24 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
       {files.length ? (
         files.map((item) => <FileRow key={item.id} item={item} />)
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
-          <Upload className="size-9 text-primary" />
-          <h3 className="font-semibold">Drop your everyday files here</h3>
-          <p className="max-w-72 text-sm text-muted-foreground">
-            DeskGarage keeps its own copy. Moving or deleting the original won't affect it.
-          </p>
-        </div>
+        <ScreenMessage
+          icon={<Upload className="size-9" />}
+          title={name ? `No files in ${name}` : 'No files yet'}
+          description="Drag in the files you want close at hand, from anywhere in your workspace."
+          actions={
+            showAddButton ? (
+              <Button
+                disabled={isWorking}
+                onClick={() => {
+                  void command({ type: 'pickFiles', containerId });
+                }}
+              >
+                <FilePlus2 />
+                Add files
+              </Button>
+            ) : undefined
+          }
+        />
       )}
     </section>
   );

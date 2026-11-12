@@ -5,7 +5,7 @@ export const Route = createFileRoute('/quick/trash')({ component: QuickTrash });
 
 function QuickTrash() {
   return (
-    <div className="space-y-4">
+    <div className="flex min-h-full flex-1 flex-col gap-4">
       <h2 className="font-semibold">Trash</h2>
       <TrashList />
     </div>

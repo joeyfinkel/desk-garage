@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from '@tanstack/react-router';
 import { Folder, Plus } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { useContainerWorkspace } from '../../../-utils/containers';
+import { ScreenMessage } from '../../../../components/screen-message';
 import { GaragePage } from './page';
 
 export function ContainersIndex() {
@@ -16,20 +17,23 @@ export function ContainersIndex() {
 
   return (
     <GaragePage>
-      <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed">
-        <Folder size={30} className="text-muted-foreground" />
-        <p className="mt-4 text-sm text-muted-foreground">Create a container to get started.</p>
-        <ContainerCreate
-          onCreated={(id) => {
-            void navigate({ to: '/containers/$containerId', params: { containerId: id } });
-          }}
-        >
-          <Button className="mt-5">
-            <Plus />
-            New container
-          </Button>
-        </ContainerCreate>
-      </div>
+      <ScreenMessage
+        icon={<Folder className="size-9" />}
+        title="No containers yet"
+        description="Create one to keep a private set of files on this device."
+        actions={
+          <ContainerCreate
+            onCreated={(id) => {
+              void navigate({ to: '/containers/$containerId', params: { containerId: id } });
+            }}
+          >
+            <Button>
+              <Plus />
+              New container
+            </Button>
+          </ContainerCreate>
+        }
+      />
     </GaragePage>
   );
 }
