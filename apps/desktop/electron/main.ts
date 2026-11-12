@@ -5,6 +5,7 @@ import { createWorkspaceStore } from './workspace/store';
 import { registerWorkspaceIpc } from './workspace/ipc';
 import { registerFilePreviews } from './workspace/previews';
 import { setApplicationMenu } from './application-menu';
+import { shouldOpenAtLogin } from './menu-bar-app';
 import { createWorkspaceWindows } from './windows';
 
 let tray: Tray;
@@ -19,6 +20,10 @@ protocol.registerSchemesAsPrivileged([
 app.setName('DeskGarage');
 app.on('window-all-closed', () => {});
 
+if (process.platform === 'darwin') {
+  app.setActivationPolicy('accessory');
+}
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
@@ -27,6 +32,11 @@ if (!app.requestSingleInstanceLock()) {
     const store = createWorkspaceStore(join(app.getPath('userData'), 'workspace'));
     const { hasDialog } = registerWorkspaceIpc(store);
     registerFilePreviews(store);
+
+    if (shouldOpenAtLogin({ packaged: app.isPackaged, platform: process.platform })) {
+      app.setLoginItemSettings({ openAtLogin: true });
+    }
+
     const windows = createWorkspaceWindows(hasDialog);
     const icon = nativeImage.createFromPath(iconPath);
     icon.setTemplateImage(true);
@@ -43,7 +53,10 @@ if (!app.requestSingleInstanceLock()) {
     );
     tray.setToolTip('DeskGarage');
     tray.on('click', () => windows.showQuick(tray));
-    tray.on('right-click', () => tray.popUpContextMenu(menu));
+    tray.on('right-click', () => {
+      windows.noteStatusItemClick();
+      tray.popUpContextMenu(menu);
+    });
     app.on('activate', windows.activate);
     app.on('second-instance', () => windows.showMain());
   });

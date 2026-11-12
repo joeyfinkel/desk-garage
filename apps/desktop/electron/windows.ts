@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import type { Tray } from 'electron';
 import { fileURLToPath } from 'node:url';
+import { STATUS_ITEM_ACTIVATE_GRACE_MS, shouldOpenMainWindow, statusItemSuppressUntil } from './menu-bar-app';
 import { getTrustedWindow } from './trusted-window';
 import { positionTrayPanel } from './panel-position';
 
@@ -9,6 +10,7 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
   let quick: BrowserWindow | undefined;
   let isQuitting = false;
   let hiddenAt = 0;
+  let suppressMainUntil = 0;
 
   app.on('before-quit', () => {
     isQuitting = true;
@@ -40,6 +42,10 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
       minimizable: !isQuick,
       alwaysOnTop: isQuick,
       skipTaskbar: isQuick,
+      fullscreenable: !isQuick,
+      acceptFirstMouse: isQuick,
+      hiddenInMissionControl: isQuick && process.platform === 'darwin',
+      type: isQuick && process.platform === 'darwin' ? 'panel' : undefined,
       titleBarStyle: !isQuick && process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
         nodeIntegration: false,
@@ -48,6 +54,12 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
         preload: fileURLToPath(new URL('../electron/preload.cjs', import.meta.url)),
       },
     });
+
+    if (isQuick && process.platform === 'darwin') {
+      window.setAlwaysOnTop(true, 'pop-up-menu');
+      window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    }
+
     window.on('page-title-updated', (event) => event.preventDefault());
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     window.webContents.on('will-navigate', (event) => event.preventDefault());
@@ -62,6 +74,10 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
   }
 
   function showMain(containerId?: string) {
+    if (process.platform === 'darwin') {
+      app.setActivationPolicy('regular');
+    }
+
     quick?.hide();
     const route = containerId ? `/containers/${encodeURIComponent(containerId)}` : '/containers';
 
@@ -69,6 +85,10 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
       main = makeWindow(false);
       main.once('closed', () => {
         main = undefined;
+
+        if (process.platform === 'darwin' && !isQuitting) {
+          app.setActivationPolicy('accessory');
+        }
       });
       main.once('ready-to-show', () => {
         main?.show();
@@ -90,6 +110,8 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
   }
 
   function showQuick(tray: Tray) {
+    noteStatusItemClick();
+
     if (quick?.isVisible()) {
       quick.hide();
 
@@ -130,6 +152,10 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
     }
   }
 
+  function noteStatusItemClick() {
+    suppressMainUntil = statusItemSuppressUntil(Date.now());
+  }
+
   ipcMain.handle('window:open-main', (event, containerId: unknown) => {
     getTrustedWindow(event);
 
@@ -148,10 +174,16 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
   });
 
   function activate() {
-    if (!quick?.isVisible()) {
+    setTimeout(() => {
+      const quickVisible = Boolean(quick && !quick.isDestroyed() && quick.isVisible());
+
+      if (!shouldOpenMainWindow({ quickVisible, suppressUntil: suppressMainUntil, now: Date.now() })) {
+        return;
+      }
+
       showMain();
-    }
+    }, STATUS_ITEM_ACTIVATE_GRACE_MS);
   }
 
-  return { showMain, showQuick, activate };
+  return { showMain, showQuick, activate, noteStatusItemClick };
 }

@@ -38,7 +38,7 @@ pnpm dev
 
 The development command starts the renderer through Portless and opens Electron at the URL provided by Portless (`https://desk-garage.localhost` with default proxy settings). Do not start a renderer server separately. The Electron binary downloads on its first invocation.
 
-DeskGarage starts in the menu bar without opening the full window. Click its status icon for quick access: switch or create containers, import and export files, remove items or containers, and recover them from trash. The expand button opens the full window at the selected container. Right-click the status icon for the full-window and Quit actions. While DeskGarage is focused, **Window → Quick Access** (`Cmd/Ctrl+Shift+Space`) opens the same panel.
+DeskGarage stays in the menu bar without a Dock icon until the full window is opened. Closing that window leaves the status icon running. A packaged build also opens at login, still without showing a window. Click its status icon for quick access: switch or create containers, import and export files, remove items or containers, and recover them from trash. That click opens only the panel. The expand button opens the full window at the selected container. Right-click the status icon for the full-window and Quit actions. While DeskGarage is focused, **Window → Quick Access** (`Cmd/Ctrl+Shift+Space`) opens the same panel.
 
 The panel hides on click-away or Escape and stays open for native file dialogs. The full window is created only when requested; closing it releases its renderer while DeskGarage stays in the tray. The compact and full windows receive native change notifications, with revision checks preventing stale responses from rolling back either view. Stop `pnpm dev` to stop the development session.
 
