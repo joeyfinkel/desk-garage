@@ -131,7 +131,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "8f1dd9d4127828a0e05efc18389f8bb43966d60d7c1284e19127d24654f6831f"
+      "sha256": "e65105c80900898b4104ce20794b18f0f376b415a0b68a82b1baa5c5bbf920f0"
     },
     {
       "path": ".gitignore",
@@ -145,7 +145,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "ac2698e059fc766e1960ded8dc9907716e117735a13ab6c713a8dbb19f988e1d"
+      "sha256": "de55513346799cc99c73ef56b8d04e8442691d9a81dc7ed111c79bf00d5cdb85"
     },
     {
       "path": "apps/web/README.md",

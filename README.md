@@ -61,4 +61,6 @@ pnpm test
 pnpm format:check
 ```
 
+GitHub Actions runs that sequence on every push and pull request. The build step compiles the desktop app: the Electron main process and the renderer.
+
 The roadmap is private desktop containers, shared containers with authorized-device access, then mobile CRUD and incoming OS sharing. An agent interface can follow through MCP.
