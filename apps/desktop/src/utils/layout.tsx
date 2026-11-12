@@ -1,9 +1,10 @@
+import { LockKeyhole } from 'lucide-react';
 import { createProp, defineResourceLayout } from '@jfdevelops/react-layout';
 import { PageFrame } from '@desk-garage/ui/page-frame';
 import { PageHeader } from '@desk-garage/ui/page-header';
 import { PageContent } from '@desk-garage/ui/page-content';
 
-export const { createResourceLayout } = defineResourceLayout({
+export const workspaceLayout = defineResourceLayout({
   resources: ['containers', 'trash'],
   options: {
     description: createProp.component({ type: 'ReactNode' }),
@@ -24,7 +25,27 @@ export const { createResourceLayout } = defineResourceLayout({
         footer: createProp.component({ type: 'ReactNode' }).optional(),
       },
     },
-    render: function ResourcePage({ title, description, children, eyebrow, actions, footer }, { composables }) {
+    render: function ResourcePage(
+      {
+        title,
+        description,
+        children,
+        actions,
+        eyebrow = (
+          <>
+            <LockKeyhole size={12} />
+            Private workspace
+          </>
+        ),
+        footer = (
+          <footer className="mt-6 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>DESKGARAGE · EARLY PREVIEW</span>
+            <span>Private by default. Yours to keep.</span>
+          </footer>
+        ),
+      },
+      { composables },
+    ) {
       return (
         <composables.Layout>
           <composables.Header title={title} description={description} eyebrow={eyebrow} actions={actions} />
@@ -35,3 +56,5 @@ export const { createResourceLayout } = defineResourceLayout({
     },
   },
 });
+
+export const { createResourceLayout } = workspaceLayout;

@@ -9,7 +9,8 @@
       "!package-lock.json",
       "!yarn.lock",
       "!bun.lock",
-      "!**/dist/**"
+      "!**/dist/**",
+      "!**/route-tree.gen.ts"
     ]
   },
   "formatter": {

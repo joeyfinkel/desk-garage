@@ -29,18 +29,24 @@ export function useContainers() {
 
   function changeContainer(id: string, operation: typeof trash) {
     const result = runContainerOperation(operation(id));
-    Result.match(result, {
-      onSuccess: (containers) => setState({ containers, storageError: '' }),
-      onFailure: (error) => setState((current) => ({ ...current, storageError: error.message })),
-    });
+
+    if (Result.isFailure(result)) {
+      setState((current) => ({ ...current, storageError: result.failure.message }));
+
+      return false;
+    }
+
+    setState({ containers: result.success, storageError: '' });
+
+    return true;
   }
 
   function trashContainer(id: string) {
-    changeContainer(id, trash);
+    return changeContainer(id, trash);
   }
 
   function restoreContainer(id: string) {
-    changeContainer(id, restore);
+    return changeContainer(id, restore);
   }
 
   return { ...state, addContainer, trashContainer, restoreContainer };
