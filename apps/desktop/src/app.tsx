@@ -5,6 +5,7 @@ import { Input } from '@desk-garage/ui/input';
 import { cn } from '@desk-garage/ui/cn';
 import { EmptyContainer } from './components/empty-container';
 import { useContainers } from './use-containers';
+import { ContainersPage, CreateContainerPage, TrashPage } from './components/pages';
 
 export function App() {
   const { containers, addContainer, trashContainer, restoreContainer, storageError } = useContainers();
@@ -15,6 +16,7 @@ export function App() {
   const active = containers.filter((container) => !container.deletedAt);
   const trashed = containers.filter((container) => container.deletedAt);
   const selected = active.find((container) => container.id === selectedId) ?? active[0];
+  const Page = isCreating ? CreateContainerPage : isTrash ? TrashPage : ContainersPage;
 
   return (
     <div className="flex min-h-screen">
@@ -91,26 +93,28 @@ export function App() {
           </div>
         </div>
       </aside>
-      <main className="flex min-w-0 flex-1 flex-col p-8">
-        <header className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <div className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <LockKeyhole size={12} />
-              Private workspace
-            </div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {isCreating ? 'New container' : isTrash ? 'Trash' : (selected?.name ?? 'Your garage')}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isTrash ? 'Recover containers you have removed.' : 'Keep the things you reach for close at hand.'}
-            </p>
-          </div>
-          {!isTrash && !isCreating && selected && (
+      <Page
+        title={isCreating ? 'New container' : isTrash ? 'Trash' : (selected?.name ?? 'Your garage')}
+        eyebrow={
+          <>
+            <LockKeyhole size={12} />
+            Private workspace
+          </>
+        }
+        actions={
+          !isTrash && !isCreating && selected ? (
             <Button variant="ghost" size="icon" aria-label="Move container to trash" onClick={() => trashContainer(selected.id)}>
               <Trash2 className="text-muted-foreground" />
             </Button>
-          )}
-        </header>
+          ) : undefined
+        }
+        footer={
+          <footer className="mt-6 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>DESKGARAGE · EARLY PREVIEW</span>
+            <span>Private by default. Yours to keep.</span>
+          </footer>
+        }
+      >
         {storageError && (
           <p role="alert" className="mb-4 text-sm text-destructive">
             {storageError}
@@ -195,11 +199,7 @@ export function App() {
             </Button>
           </div>
         )}
-        <footer className="mt-6 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>DESKGARAGE · EARLY PREVIEW</span>
-          <span>Private by default. Yours to keep.</span>
-        </footer>
-      </main>
+      </Page>
     </div>
   );
 }

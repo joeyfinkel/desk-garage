@@ -7,14 +7,17 @@
     "./button": "./src/components/button.tsx",
     "./input": "./src/components/input.tsx",
     "./cn": "./src/lib/utils.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./page-frame": "./src/layout/page-frame.tsx",
+    "./page-header": "./src/layout/page-header.tsx",
+    "./page-content": "./src/layout/page-content.tsx"
   },
   "dependencies": {
     "@desk-garage/theme": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.5.0",
-    "radix-ui": "^1.4.3"
+    "radix-ui": "^1.4.3",
+    "tailwind-merge": "^3.5.0"
   },
   "peerDependencies": {
     "react": "^19.2.0",

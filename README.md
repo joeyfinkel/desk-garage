@@ -12,6 +12,10 @@ A private home for the files, links, and snippets you reach for often.
 
 Shared code belongs in packages. Native mobile components will consume the same design tokens rather than DOM components. Convex with Better Auth will live in a shared backend package when shared containers are implemented. Private containers remain local and do not require authentication.
 
+## Layouts
+
+The desktop uses `@jfdevelops/react-layout` with a central resource definition in `apps/desktop/src/utils/layout.tsx` and page factories in `apps/desktop/src/components/pages.ts`. Semantic layout regions wrap shared primitives from `packages/ui/src/layout`. Add page configuration through the central factory and keep application behavior in services and hooks.
+
 ## Application runtime
 
 Use Effect for application services, asynchronous workflows, resource lifecycles, and typed errors as the app grows. Keep React components focused on presentation and local interaction state. Shared services belong in workspace packages; platform-specific adapters stay with their app. Container persistence and create/trash/restore workflows use Effect 4. The desktop supplies a local-storage adapter and interprets synchronous effects at the React boundary. Mutations update the UI only after persistence succeeds; invalid stored data is reported without overwriting it.

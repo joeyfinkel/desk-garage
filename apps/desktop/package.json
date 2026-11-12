@@ -13,6 +13,7 @@
     "@desk-garage/containers": "workspace:*",
     "@desk-garage/theme": "workspace:*",
     "@desk-garage/ui": "workspace:*",
+    "@jfdevelops/react-layout": "^2.7.0",
     "effect": "^4.1.4",
     "lucide-react": "^0.577.0",
     "react": "^19.2.0",

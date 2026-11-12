@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@desk-garage/theme/tokens.css";
 @source "./components";
+@source "./layout";
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
