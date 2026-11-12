@@ -186,9 +186,7 @@ export function createWorkspaceStore(root: string) {
           const next = {
             ...workspace,
             revision: workspace.revision + 1,
-            items: workspace.items.map((item) =>
-              item.id === command.id ? { ...item, name, body, size: Buffer.byteLength(body) } : item,
-            ),
+            items: workspace.items.map((item) => (item.id === command.id ? { ...item, name, body, size: Buffer.byteLength(body) } : item)),
           };
           yield* save(next);
 

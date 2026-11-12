@@ -2,7 +2,13 @@ import { Link } from '@tanstack/react-router';
 import { SearchX } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { PageFrame } from '@desk-garage/ui/page-frame';
-import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
+import {
+  ScreenMessage,
+  ScreenMessageActions,
+  ScreenMessageDescription,
+  ScreenMessageIcon,
+  ScreenMessageTitle,
+} from '../../components/screen-message';
 
 export function NotFound() {
   return (

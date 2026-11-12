@@ -50,7 +50,9 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
       const window = getTrustedWindow(event);
       const command = await Effect.runPromise(
         Schema.decodeUnknownEffect(WorkspaceCommand)(input).pipe(
-          Effect.mapError((cause) => new WorkspaceError({ message: 'This action is not available. Restart DeskGarage and try again.', cause })),
+          Effect.mapError(
+            (cause) => new WorkspaceError({ message: 'This action is not available. Restart DeskGarage and try again.', cause }),
+          ),
         ),
       );
       let operation;

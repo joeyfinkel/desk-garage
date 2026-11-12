@@ -40,7 +40,13 @@ export function TrashList() {
     <div className="flex min-h-full flex-1 flex-col gap-3">
       <div className="flex flex-wrap gap-1" role="group" aria-label="Filter trash">
         {filters.map((option) => (
-          <Button key={option} size="sm" variant={filter === option ? 'default' : 'outline'} aria-pressed={filter === option} onClick={() => setFilter(option)}>
+          <Button
+            key={option}
+            size="sm"
+            variant={filter === option ? 'default' : 'outline'}
+            aria-pressed={filter === option}
+            onClick={() => setFilter(option)}
+          >
             {option}
             <span className="text-xs opacity-70">{counts[option]}</span>
           </Button>
@@ -64,7 +70,13 @@ export function TrashList() {
             />
           ))}
           {visibleItems.map((item) => (
-            <TrashedItem key={item.id} item={item} containers={containers} disabled={isWorking} onRestore={() => void command({ type: 'restoreItem', id: item.id })} />
+            <TrashedItem
+              key={item.id}
+              item={item}
+              containers={containers}
+              disabled={isWorking}
+              onRestore={() => void command({ type: 'restoreItem', id: item.id })}
+            />
           ))}
         </>
       ) : (

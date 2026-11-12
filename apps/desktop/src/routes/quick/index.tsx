@@ -3,7 +3,13 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Folder } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { FileShelf } from '../../components/file-shelf';
-import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
+import {
+  ScreenMessage,
+  ScreenMessageActions,
+  ScreenMessageDescription,
+  ScreenMessageIcon,
+  ScreenMessageTitle,
+} from '../../components/screen-message';
 import { useQuickContainer } from './-utils/container';
 
 export const Route = createFileRoute('/quick/')({ component: QuickFiles });

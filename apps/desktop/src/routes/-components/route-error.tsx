@@ -3,7 +3,13 @@ import { Link, useRouter } from '@tanstack/react-router';
 import { CircleAlert } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { PageFrame } from '@desk-garage/ui/page-frame';
-import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
+import {
+  ScreenMessage,
+  ScreenMessageActions,
+  ScreenMessageDescription,
+  ScreenMessageIcon,
+  ScreenMessageTitle,
+} from '../../components/screen-message';
 
 export function RouteError({ reset }: Partial<ErrorComponentProps> = {}) {
   const router = useRouter();

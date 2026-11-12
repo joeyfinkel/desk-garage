@@ -244,5 +244,5 @@ function crc32(data: Buffer) {
     }
   }
 
-  return (~crc) >>> 0;
+  return ~crc >>> 0;
 }

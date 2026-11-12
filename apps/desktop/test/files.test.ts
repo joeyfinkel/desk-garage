@@ -159,9 +159,7 @@ describe('native file storage', () => {
 
   it('keeps a note as text that can be renamed and read again', async () => {
     const { store } = await setup();
-    const created = await Effect.runPromise(
-      store.execute({ type: 'createNote', containerId: 'everyday', body: 'alex@example.com' }),
-    );
+    const created = await Effect.runPromise(store.execute({ type: 'createNote', containerId: 'everyday', body: 'alex@example.com' }));
     expect(created.items.at(-1)).toMatchObject({ name: 'alex@example.com', body: 'alex@example.com' });
     const id = created.items.at(-1)?.id ?? '';
     const updated = await Effect.runPromise(store.execute({ type: 'updateNote', id, name: 'Alex', body: 'alex@example.com' }));

@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
 import type { Container } from '@desk-garage/containers';
 import { Button } from '@desk-garage/ui/button';
-import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@desk-garage/ui/dialog';
+import {
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@desk-garage/ui/dialog';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 import { TriggerDialog, useTriggerDialog } from './trigger-dialog';
 

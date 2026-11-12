@@ -1,6 +1,12 @@
 import { CircleAlert } from 'lucide-react';
 import { createProp } from '@jfdevelops/react-layout';
-import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
+import {
+  ScreenMessage,
+  ScreenMessageActions,
+  ScreenMessageDescription,
+  ScreenMessageIcon,
+  ScreenMessageTitle,
+} from '../../components/screen-message';
 import { createRenderState } from './base';
 
 export const errorState = createRenderState({
