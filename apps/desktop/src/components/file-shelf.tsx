@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FilePlus2, Upload } from 'lucide-react';
+import { FilePlus2, StickyNote, Upload } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { cn } from '@desk-garage/ui/cn';
 import { useContainerWorkspace } from '../routes/-utils/containers';
@@ -44,16 +44,11 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
             {files.length} {files.length === 1 ? 'file' : 'files'}
           </span>
           {showAddButton && (
-            <Button
-              size="sm"
-              disabled={isWorking}
-              onClick={() => {
-                void command({ type: 'pickFiles', containerId });
-              }}
-            >
-              <FilePlus2 />
-              Add files
-            </Button>
+            <ShelfActions
+              isWorking={isWorking}
+              addNote={() => void command({ type: 'createNote', containerId, body: '' })}
+              pickFiles={() => void command({ type: 'pickFiles', containerId })}
+            />
           )}
         </div>
       )}
@@ -73,19 +68,30 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
           <ScreenMessageDescription>Drag in the files you want close at hand, from anywhere in your workspace.</ScreenMessageDescription>
           {showAddButton ? (
             <ScreenMessageActions>
-              <Button
-                disabled={isWorking}
-                onClick={() => {
-                  void command({ type: 'pickFiles', containerId });
-                }}
-              >
-                <FilePlus2 />
-                Add files
-              </Button>
+              <ShelfActions
+                isWorking={isWorking}
+                addNote={() => void command({ type: 'createNote', containerId, body: '' })}
+                pickFiles={() => void command({ type: 'pickFiles', containerId })}
+              />
             </ScreenMessageActions>
           ) : null}
         </ScreenMessage>
       )}
     </section>
+  );
+}
+
+function ShelfActions({ isWorking, addNote, pickFiles }: { isWorking: boolean; addNote: () => void; pickFiles: () => void }) {
+  return (
+    <div className="flex gap-2">
+      <Button size="sm" variant="outline" disabled={isWorking} onClick={addNote}>
+        <StickyNote />
+        Add note
+      </Button>
+      <Button size="sm" disabled={isWorking} onClick={pickFiles}>
+        <FilePlus2 />
+        Add files
+      </Button>
+    </div>
   );
 }

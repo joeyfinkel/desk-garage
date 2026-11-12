@@ -148,7 +148,7 @@ describe('desktop routes', () => {
       await act(async () => trigger?.click());
       const popover = document.querySelector('[data-slot="popover-content"]');
       const actions = Array.from(popover?.querySelectorAll('button') ?? []);
-      expect(actions.map((button) => button.textContent)).toEqual(['Add file', 'Edit container', 'Delete container']);
+      expect(actions.map((button) => button.textContent)).toEqual(['Add file', 'Add note', 'Edit container', 'Delete container']);
       await act(async () => actions[0]?.click());
       expect(commands).toContainEqual({ type: 'pickFiles', containerId: 'everyday' });
       await act(async () => trigger?.click());

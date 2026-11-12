@@ -1,12 +1,20 @@
-import { app, Menu, nativeImage, Tray } from 'electron';
+import { app, Menu, nativeImage, protocol, Tray } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createWorkspaceStore } from './workspace/store';
 import { registerWorkspaceIpc } from './workspace/ipc';
+import { registerFilePreviews } from './workspace/previews';
 import { setApplicationMenu } from './application-menu';
 import { createWorkspaceWindows } from './windows';
 
 let tray: Tray;
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'desk-file',
+    privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true, bypassCSP: true },
+  },
+]);
 
 app.setName('DeskGarage');
 app.on('window-all-closed', () => {});
@@ -18,6 +26,7 @@ if (!app.requestSingleInstanceLock()) {
     const iconPath = fileURLToPath(new URL('../electron/tray.png', import.meta.url));
     const store = createWorkspaceStore(join(app.getPath('userData'), 'workspace'));
     const { hasDialog } = registerWorkspaceIpc(store, iconPath);
+    registerFilePreviews(store);
     const windows = createWorkspaceWindows(hasDialog);
     const icon = nativeImage.createFromPath(iconPath);
     icon.setTemplateImage(true);

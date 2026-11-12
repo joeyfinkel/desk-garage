@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Atom } from 'effect/reactivity';
 import { make as makeScopedAtom, useAtom } from '@effect/atom-react';
-import { Ellipsis, FilePlus2, Pencil, Trash2 } from 'lucide-react';
+import { Ellipsis, FilePlus2, Pencil, StickyNote, Trash2 } from 'lucide-react';
 import type { Container } from '@desk-garage/containers';
 import { Button } from '@desk-garage/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@desk-garage/ui/popover';
@@ -58,6 +58,18 @@ function Actions({ container }: { container: Container }) {
         >
           <FilePlus2 />
           Add file
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          disabled={isWorking}
+          onClick={() => {
+            setIsOpen(false);
+            void command({ type: 'createNote', containerId: container.id, body: '' });
+          }}
+        >
+          <StickyNote />
+          Add note
         </Button>
         <ContainerEdit container={container}>
           <Button variant="ghost" className="w-full justify-start" disabled={isWorking}>
