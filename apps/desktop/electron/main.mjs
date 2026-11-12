@@ -16,6 +16,7 @@ function createWindow() {
     minWidth: 740,
     minHeight: 540,
     title: 'DeskGarage',
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     backgroundColor: '#f7f7f4',
     webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true },
   });

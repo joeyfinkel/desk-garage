@@ -12,10 +12,21 @@ function makeRouter(path: string) {
 describe('desktop routes', () => {
   beforeEach(() => {
     vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }));
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('redirects the initial app location to containers', async () => {
