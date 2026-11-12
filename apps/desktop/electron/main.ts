@@ -25,7 +25,7 @@ if (!app.requestSingleInstanceLock()) {
   void app.whenReady().then(() => {
     const iconPath = fileURLToPath(new URL('../electron/tray.png', import.meta.url));
     const store = createWorkspaceStore(join(app.getPath('userData'), 'workspace'));
-    const { hasDialog } = registerWorkspaceIpc(store, iconPath);
+    const { hasDialog } = registerWorkspaceIpc(store);
     registerFilePreviews(store);
     const windows = createWorkspaceWindows(hasDialog);
     const icon = nativeImage.createFromPath(iconPath);

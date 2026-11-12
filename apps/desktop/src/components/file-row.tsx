@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
 import type { FileItem } from '@desk-garage/workspace';
 import { Button } from '@desk-garage/ui/button';
 import { useContainerWorkspace } from '../routes/-utils/containers';
+import { fileTypeDragImage } from './file-type-drag-image';
 import { FileMark } from './file-mark';
 import { FileTypeIcon } from './file-type-icon';
 
@@ -95,6 +96,11 @@ function NoteRow({ item }: { item: FileItem }) {
 
         event.dataTransfer.setData('text/plain', draft);
         event.dataTransfer.effectAllowed = 'copy';
+        const image = fileTypeDragImage('NOTE');
+
+        if (image.complete && image.naturalWidth > 0) {
+          event.dataTransfer.setDragImage(image, image.naturalWidth / 2, image.naturalHeight / 2);
+        }
       }}
     >
       <div className="flex items-center gap-2">

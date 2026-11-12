@@ -1,11 +1,29 @@
-import { BrowserWindow, dialog, ipcMain, nativeImage } from 'electron';
+import { BrowserWindow, dialog, ipcMain, nativeImage, type NativeImage } from 'electron';
 import { copyFile, writeFile } from 'node:fs/promises';
 import { Effect, Result, Schema } from 'effect';
 import { WorkspaceCommand, WorkspaceError, type WorkspaceResponse } from '@desk-garage/workspace';
 import { getTrustedWindow } from '../trusted-window';
+import { renderFileTypeIconPng } from './file-type-drag-icon';
+import { fileTypeLabel } from '../../src/file-type-icon-svg';
 import type { createWorkspaceStore } from './store';
 
-export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceStore>, dragIconPath: string) {
+const dragIcons = new Map<string, NativeImage>();
+
+function dragIcon(name: string) {
+  const label = fileTypeLabel(name);
+  const cached = dragIcons.get(label);
+
+  if (cached) {
+    return cached;
+  }
+
+  const icon = nativeImage.createFromBuffer(renderFileTypeIconPng(name), { scaleFactor: 2 });
+  dragIcons.set(label, icon);
+
+  return icon;
+}
+
+export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceStore>) {
   const dialogs = new Set<number>();
 
   function withDialog<A>(window: BrowserWindow, action: () => Promise<A>) {
@@ -93,9 +111,9 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
     }
 
     void Effect.runPromise(store.fileForItem(input))
-      .then(({ path }) => {
+      .then(({ item, path }) => {
         if (path && !event.sender.isDestroyed()) {
-          event.sender.startDrag({ file: path, icon: nativeImage.createFromPath(dragIconPath).resize({ width: 32, height: 32 }) });
+          event.sender.startDrag({ file: path, icon: dragIcon(item.name) });
         }
       })
       .catch(() => event.sender.send('workspace:changed'));
