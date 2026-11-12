@@ -1,14 +1,16 @@
 const VERSION = /^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta)\.(\d+))?$/;
 
-export const releasePackageFiles = [
-  'package.json',
-  'apps/desktop/package.json',
-  'apps/web/package.json',
-  'packages/containers/package.json',
-  'packages/theme/package.json',
-  'packages/ui/package.json',
-  'packages/workspace/package.json',
+export const releasePackages = [
+  { name: 'desk-garage', file: 'package.json' },
+  { name: 'desk-garage-desktop', file: 'apps/desktop/package.json' },
+  { name: 'desk-garage-web', file: 'apps/web/package.json' },
+  { name: '@desk-garage/containers', file: 'packages/containers/package.json' },
+  { name: '@desk-garage/theme', file: 'packages/theme/package.json' },
+  { name: '@desk-garage/ui', file: 'packages/ui/package.json' },
+  { name: '@desk-garage/workspace', file: 'packages/workspace/package.json' },
 ];
+
+export const releasePackageFiles = releasePackages.map((pkg) => pkg.file);
 
 export function parseVersion(version) {
   const match = VERSION.exec(version);
@@ -76,14 +78,56 @@ export function highestRelease(versions, channel) {
 
 const changeWords = ['amber', 'brisk', 'calm', 'daisy', 'ember', 'flint', 'gentle', 'harbor', 'ivory', 'juniper'];
 
-export function changeDocument(bump, summary) {
-  if (!(bump in bumpRank)) {
-    throw new Error(`Expected patch, minor, or major, received '${bump}'.`);
+export function changeDocument(releases, summary) {
+  if (!Array.isArray(releases) || releases.length === 0) {
+    throw new Error('Name at least one package.');
   }
 
+  const lines = releases.map((release) => {
+    if (!(release.bump in bumpRank)) {
+      throw new Error(`Expected patch, minor, or major, received '${release.bump}'.`);
+    }
+
+    if (!release.name || /\s/.test(release.name)) {
+      throw new Error(`Expected a package name, received '${release.name ?? ''}'.`);
+    }
+
+    return `${release.bump} ${release.name}`;
+  });
   const note = summary.trim();
 
-  return note ? `${bump}\n\n${note}\n` : `${bump}\n`;
+  return note ? `${lines.join('\n')}\n\n${note}\n` : `${lines.join('\n')}\n`;
+}
+
+export function selectedPackages(answer, packages = releasePackages) {
+  const picks = answer
+    .split(/[,\s]+/)
+    .map((pick) => pick.trim())
+    .filter((pick) => pick);
+  const names = [];
+  const seen = new Set();
+
+  if (picks.length === 0) {
+    throw new Error('Name at least one package.');
+  }
+
+  for (const pick of picks) {
+    const index = Number(pick);
+    const numbered = Number.isInteger(index) && String(index) === pick;
+    const name =
+      numbered && index >= 1 && index <= packages.length ? packages[index - 1].name : packages.find((pkg) => pkg.name === pick)?.name;
+
+    if (!name) {
+      throw new Error(`Unknown package '${pick}'.`);
+    }
+
+    if (!seen.has(name)) {
+      seen.add(name);
+      names.push(name);
+    }
+  }
+
+  return names;
 }
 
 export function changeFilename(existing, random = Math.random) {
@@ -100,14 +144,72 @@ export function changeFilename(existing, random = Math.random) {
 }
 
 export function readChange(source, filename = '.changes') {
-  const [firstLine = '', ...rest] = source.trim().split('\n');
-  const bump = firstLine.trim();
+  const [head = '', ...notes] = source.trim().split(/\n\n/);
+  const releases = head
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line)
+    .map((line) => {
+      const match = /^(patch|minor|major)\s+(\S+)$/.exec(line);
 
-  if (!(bump in bumpRank)) {
-    throw new Error(`${filename} must start with patch, minor, or major.`);
+      if (!match) {
+        throw new Error(`${filename} must list a bump and a package, for example 'patch desk-garage-desktop'.`);
+      }
+
+      return { bump: match[1], name: match[2] };
+    });
+
+  if (releases.length === 0) {
+    throw new Error(`${filename} must name at least one package.`);
   }
 
-  return { bump, summary: rest.join('\n').trim() };
+  return { releases, summary: notes.join('\n\n').trim() };
+}
+
+export function packageBumps(changes, packages = releasePackages) {
+  const allowed = new Set(packages.map((pkg) => pkg.name));
+  const bumps = new Map();
+
+  for (const change of changes) {
+    for (const release of change.releases) {
+      if (!allowed.has(release.name)) {
+        throw new Error(`Unknown package '${release.name}'.`);
+      }
+
+      const current = bumps.get(release.name);
+
+      bumps.set(release.name, current ? highestBump([current, release.bump]) : release.bump);
+    }
+  }
+
+  return bumps;
+}
+
+export function packageReleasePlan({ versions, bumps, channel, desktopTags = [], packages = releasePackages }) {
+  const plan = [];
+
+  for (const pkg of packages) {
+    const bump = bumps.get(pkg.name);
+
+    if (!bump) {
+      continue;
+    }
+
+    const current = versions.get(pkg.name);
+
+    if (!current) {
+      throw new Error(`Package ${pkg.name} is missing a version.`);
+    }
+
+    const version =
+      pkg.name === 'desk-garage-desktop'
+        ? nextChannelVersion(current, desktopTags, channel, bump)
+        : nextReleaseVersion(current, channel, bump);
+
+    plan.push({ name: pkg.name, file: pkg.file, version });
+  }
+
+  return plan;
 }
 
 export function highestBump(bumps) {
@@ -178,11 +280,12 @@ export function isReleaseCommit(subject) {
   return subject.startsWith('chore(release):');
 }
 
-export function releaseNotes({ version, commits, previousTag, summaries = [] }) {
+export function releaseNotes({ version, commits, previousTag, summaries = [], packages = [] }) {
   const notes = summaries.filter((summary) => summary);
   const summaryBlock = notes.length > 0 ? `${notes.map((summary) => `- ${summary}`).join('\n')}\n\n` : '';
+  const packageBlock = packages.length > 0 ? `### Packages\n\n${packages.map((pkg) => `- ${pkg.name} ${pkg.version}`).join('\n')}\n\n` : '';
   const items = commits.length > 0 ? commits.map((commit) => `- ${commit}`).join('\n') : '- No listed changes.';
-  const compare = previousTag ? `\n\n**Full changelog**: ${previousTag}...v${version}` : '';
+  const compare = previousTag && version ? `\n\n**Full changelog**: ${previousTag}...v${version}` : '';
 
-  return `## What's Changed\n\n${summaryBlock}${items}${compare}\n`;
+  return `## What's Changed\n\n${summaryBlock}${packageBlock}${items}${compare}\n`;
 }

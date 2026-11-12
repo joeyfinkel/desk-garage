@@ -65,14 +65,15 @@ GitHub Actions runs that sequence on every push and pull request. The build step
 
 ## Releases
 
-The release channel is the branch a pull request targets. The release runs only after that pull request is merged. Merging into `alpha` publishes an alpha, merging into `beta` publishes a beta, and merging into `main` publishes a stable version. A direct push does not publish. The bump is chosen in the pull request. Run `pnpm changeset`, pick patch, minor, or major, and write the note. That writes a file under `.changes/` whose first line is the bump:
+The release channel is the branch a pull request targets. The release runs only after that pull request is merged. Merging into `alpha` publishes an alpha, merging into `beta` publishes a beta, and merging into `main` publishes a stable version. A direct push does not publish. Run `pnpm changeset`, pick the packages this change releases, pick patch, minor, or major, and write the note. That writes a file under `.changes/`. Each line names one package:
 
 ```md
-minor
+patch desk-garage-desktop
+minor @desk-garage/ui
 
 The Dock icon uses the garage drawing.
 ```
 
-A pull request with no change file publishes a patch. When several files are present, the highest bump wins. A patch stays on the current core and advances the alpha or beta counter. A minor or major moves the core, so `1.0.0-alpha.4` with a minor becomes `1.1.0-alpha.0`. The first stable release of a prerelease core is that core for a patch (`1.0.0-beta.3` becomes `1.0.0`), `1.1.0` for a minor, or `2.0.0` for a major. A prerelease cut from a stable version applies the bump first, so a patch after `1.0.0` is `1.0.1-alpha.0`. Each release writes that version into the root package, both apps, and every package under `packages/`, removes the change files, tags the version, and opens a GitHub release. The follow-up commit is `chore(release): prepare <tag>`, and that commit does not cut another release. An alpha or beta release also attaches unsigned Mac zip files for Apple silicon and Intel. A stable release on `main` does the same. Gatekeeper will ask you to open the app from the Finder the first time.
+A package that is not named keeps its current version. Run `pnpm changeset` again when another package needs a different bump. A pull request needs one of these files. When several files name the same package, the highest bump wins. A patch stays on that package's current core and advances its alpha or beta counter. A minor or major moves the core, so `1.0.0-alpha.4` with a minor becomes `1.1.0-alpha.0`. The first stable release of a prerelease core is that core for a patch (`1.0.0-beta.3` becomes `1.0.0`), `1.1.0` for a minor, or `2.0.0` for a major. A prerelease cut from a stable version applies the bump first, so a patch after `1.0.0` is `1.0.1-alpha.0`. Each release writes the new version only into the named packages and removes the change files. The GitHub release tag is `desk-garage-desktop`'s version, and that release is skipped when the changeset does not name the desktop app. The follow-up commit is `chore(release): prepare <tag>`, and that commit does not cut another release. An alpha or beta release also attaches unsigned Mac zip files for Apple silicon and Intel. A stable release on `main` does the same. Gatekeeper will ask you to open the app from the Finder the first time.
 
 The roadmap is private desktop containers, shared containers with authorized-device access, then mobile CRUD and incoming OS sharing. An agent interface can follow through MCP.

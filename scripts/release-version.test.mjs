@@ -6,8 +6,11 @@ import {
   highestBump,
   isReleaseCommit,
   nextChannelVersion,
+  packageBumps,
+  packageReleasePlan,
   readChange,
   releaseNotes,
+  selectedPackages,
   writePackageVersion,
 } from './release-version.mjs';
 
@@ -41,10 +44,10 @@ test('the change file chooses a minor or major bump on each channel', () => {
 });
 
 test('a changeset prompt writes a file the release can read', () => {
-  const source = changeDocument('minor', 'The Dock icon uses the garage drawing.');
+  const source = changeDocument([{ bump: 'minor', name: 'desk-garage-desktop' }], 'The Dock icon uses the garage drawing.');
 
   assert.deepEqual(readChange(source, 'amber-brisk-calm.md'), {
-    bump: 'minor',
+    releases: [{ bump: 'minor', name: 'desk-garage-desktop' }],
     summary: 'The Dock icon uses the garage drawing.',
   });
   assert.equal(
@@ -58,15 +61,45 @@ test('a changeset prompt writes a file the release can read', () => {
     changeFilename(new Set(['amber-amber-amber.md']), () => rolls[roll++]),
     'brisk-brisk-brisk.md',
   );
+  assert.deepEqual(selectedPackages('1, @desk-garage/ui', [{ name: 'desk-garage-desktop' }, { name: '@desk-garage/ui' }]), [
+    'desk-garage-desktop',
+    '@desk-garage/ui',
+  ]);
 });
 
-test('several change files use the highest bump', () => {
+test('several change files use the highest bump for each named package', () => {
   assert.equal(highestBump(['patch', 'major', 'minor']), 'major');
-  assert.deepEqual(readChange('minor\n\nThe Dock icon uses the garage drawing.\n', 'dock-icon.md'), {
-    bump: 'minor',
+  assert.deepEqual(readChange('minor @desk-garage/ui\n\nThe Dock icon uses the garage drawing.\n', 'dock-icon.md'), {
+    releases: [{ bump: 'minor', name: '@desk-garage/ui' }],
     summary: 'The Dock icon uses the garage drawing.',
   });
-  assert.throws(() => readChange('bigger\n', 'notes.md'), /patch, minor, or major/);
+  assert.throws(() => readChange('bigger\n', 'notes.md'), /bump and a package/);
+  assert.throws(() => packageBumps([readChange('patch not-a-package\n', 'notes.md')]), /Unknown package/);
+
+  const bumps = packageBumps([
+    readChange('patch @desk-garage/ui\npatch desk-garage-desktop\n\nMenu bar.\n', 'desktop.md'),
+    readChange('major @desk-garage/ui\n\nDialogs.\n', 'ui.md'),
+  ]);
+
+  assert.equal(bumps.get('@desk-garage/ui'), 'major');
+  assert.equal(bumps.get('desk-garage-desktop'), 'patch');
+  assert.equal(bumps.has('@desk-garage/theme'), false);
+  assert.deepEqual(
+    packageReleasePlan({
+      versions: new Map([
+        ['@desk-garage/ui', '1.0.0-alpha.0'],
+        ['desk-garage-desktop', '1.0.0-alpha.2'],
+        ['@desk-garage/theme', '1.0.0-alpha.0'],
+      ]),
+      bumps,
+      channel: 'alpha',
+      desktopTags: ['1.0.0-alpha.2'],
+    }),
+    [
+      { name: 'desk-garage-desktop', file: 'apps/desktop/package.json', version: '1.0.0-alpha.3' },
+      { name: '@desk-garage/ui', file: 'packages/ui/package.json', version: '2.0.0-alpha.0' },
+    ],
+  );
 });
 
 test('a tag ahead of package.json sets the next number', () => {
@@ -86,7 +119,8 @@ test('writes the commit list and skips calling a release commit a change', () =>
       version: '1.0.0',
       commits: ['feat(desktop): use the garage drawing as the app icon'],
       previousTag: 'v1.0.0-beta.3',
+      packages: [{ name: 'desk-garage-desktop', version: '1.0.0' }],
     }),
-    `## What's Changed\n\n- feat(desktop): use the garage drawing as the app icon\n\n**Full changelog**: v1.0.0-beta.3...v1.0.0\n`,
+    `## What's Changed\n\n### Packages\n\n- desk-garage-desktop 1.0.0\n\n- feat(desktop): use the garage drawing as the app icon\n\n**Full changelog**: v1.0.0-beta.3...v1.0.0\n`,
   );
 });

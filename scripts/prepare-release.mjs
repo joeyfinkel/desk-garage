@@ -2,15 +2,15 @@ import { execFileSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  highestBump,
   highestRelease,
   isChannelVersion,
   isReleaseCommit,
-  nextChannelVersion,
+  packageBumps,
+  packageReleasePlan,
   readChange,
   readPackageVersion,
   releaseNotes,
-  releasePackageFiles,
+  releasePackages,
   writePackageVersion,
 } from './release-version.mjs';
 
@@ -27,8 +27,16 @@ const taggedVersions = execFileSync('git', ['tag', '--list', 'v*'], { encoding: 
 const changeDirectory = '.changes';
 const changeFiles = existsSync(changeDirectory) ? readdirSync(changeDirectory).filter((name) => name.endsWith('.md')) : [];
 const changes = changeFiles.map((name) => readChange(readFileSync(join(changeDirectory, name), 'utf8'), name));
-const packageVersion = readPackageVersion(readFileSync('apps/desktop/package.json', 'utf8'));
-const version = nextChannelVersion(packageVersion, taggedVersions, channel, highestBump(changes.map((change) => change.bump)));
+const bumps = packageBumps(changes);
+
+if (bumps.size === 0) {
+  throw new Error('Add a changeset that names the packages to release.');
+}
+
+const versions = new Map(releasePackages.map((pkg) => [pkg.name, readPackageVersion(readFileSync(pkg.file, 'utf8'))]));
+const plan = packageReleasePlan({ versions, bumps, channel, desktopTags: taggedVersions });
+const desktop = plan.find((pkg) => pkg.name === 'desk-garage-desktop');
+const version = desktop?.version ?? '';
 const previous = highestRelease(taggedVersions, channel);
 const previousTag = previous ? `v${previous}` : '';
 const logRange = previousTag ? `${previousTag}..HEAD` : 'HEAD';
@@ -37,16 +45,28 @@ const commits = execFileSync('git', ['log', logRange, '--pretty=format:%s'], { e
   .map((subject) => subject.trim())
   .filter((subject) => subject && !isReleaseCommit(subject));
 
-for (const file of releasePackageFiles) {
-  writeFileSync(file, writePackageVersion(readFileSync(file, 'utf8'), version));
+for (const pkg of plan) {
+  writeFileSync(pkg.file, writePackageVersion(readFileSync(pkg.file, 'utf8'), pkg.version));
 }
 
 for (const name of changeFiles) {
   rmSync(join(changeDirectory, name));
 }
 
-writeFileSync('release-notes.md', releaseNotes({ version, commits, previousTag, summaries: changes.map((change) => change.summary) }));
+writeFileSync(
+  'release-notes.md',
+  releaseNotes({
+    version,
+    commits,
+    previousTag: version ? previousTag : '',
+    summaries: changes.map((change) => change.summary),
+    packages: plan,
+  }),
+);
 
 if (process.env.GITHUB_OUTPUT) {
-  appendFileSync(process.env.GITHUB_OUTPUT, `version=${version}\ntag=v${version}\nprerelease=${channel === 'stable' ? 'false' : 'true'}\n`);
+  appendFileSync(
+    process.env.GITHUB_OUTPUT,
+    `version=${version}\ntag=${version ? `v${version}` : ''}\npublish=${version ? 'true' : 'false'}\nprerelease=${channel === 'stable' ? 'false' : 'true'}\n`,
+  );
 }

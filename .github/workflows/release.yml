@@ -40,11 +40,13 @@ jobs:
         run: node scripts/prepare-release.mjs
 
       - name: Build the desktop app
+        if: steps.release.outputs.publish == 'true'
         run: pnpm --filter desk-garage-desktop build
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Package the Mac download
+        if: steps.release.outputs.publish == 'true'
         run: pnpm --filter desk-garage-desktop package
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
@@ -57,10 +59,16 @@ jobs:
           if [[ -d .changes ]]; then
             git add -A -- .changes
           fi
-          git commit -m "chore(release): prepare ${{ steps.release.outputs.tag }}"
+          tag="${{ steps.release.outputs.tag }}"
+          message="chore(release): prepare ${tag}"
+          if [[ -z "${tag}" ]]; then
+            message="chore(release): prepare package versions"
+          fi
+          git commit -m "${message}"
           git push origin HEAD:${{ github.event.pull_request.base.ref }}
 
       - name: Publish the GitHub release
+        if: steps.release.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
