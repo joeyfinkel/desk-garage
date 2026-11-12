@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Folder } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { FileShelf } from '../../components/file-shelf';
-import { ScreenMessage } from '../../components/screen-message';
+import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
 import { useQuickContainer } from './-utils/container';
 
 export const Route = createFileRoute('/quick/')({ component: QuickFiles });
@@ -14,11 +14,13 @@ function QuickFiles() {
 
   if (!selected) {
     return (
-      <ScreenMessage
-        icon={<Folder className="size-9" />}
-        title="No containers yet"
-        description="Create one to keep a private set of files on this device."
-        actions={
+      <ScreenMessage>
+        <ScreenMessageIcon>
+          <Folder className="size-9" />
+        </ScreenMessageIcon>
+        <ScreenMessageTitle>No containers yet</ScreenMessageTitle>
+        <ScreenMessageDescription>Create one to keep a private set of files on this device.</ScreenMessageDescription>
+        <ScreenMessageActions>
           <ContainerCreate
             onCreated={(containerId) => {
               void navigate({ to: '/quick', search: { containerId } });
@@ -26,8 +28,8 @@ function QuickFiles() {
           >
             <Button>New container</Button>
           </ContainerCreate>
-        }
-      />
+        </ScreenMessageActions>
+      </ScreenMessage>
     );
   }
 

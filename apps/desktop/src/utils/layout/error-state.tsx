@@ -1,6 +1,6 @@
 import { CircleAlert } from 'lucide-react';
 import { createProp } from '@jfdevelops/react-layout';
-import { ScreenMessage } from '../../components/screen-message';
+import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
 import { createRenderState } from './base';
 
 export const errorState = createRenderState({
@@ -15,12 +15,16 @@ export const errorState = createRenderState({
     return (
       <composables.Layout role="alert" className="min-h-full">
         <composables.Content>
-          <ScreenMessage
-            icon={<CircleAlert className="size-9" />}
-            title="Your garage didn't open"
-            description={typeof message === 'string' && message ? message : 'Saved files are still on this device. Try again.'}
-            actions={actions}
-          />
+          <ScreenMessage>
+            <ScreenMessageIcon>
+              <CircleAlert className="size-9" />
+            </ScreenMessageIcon>
+            <ScreenMessageTitle>Your garage didn't open</ScreenMessageTitle>
+            <ScreenMessageDescription>
+              {typeof message === 'string' && message ? message : 'Saved files are still on this device. Try again.'}
+            </ScreenMessageDescription>
+            {actions ? <ScreenMessageActions>{actions}</ScreenMessageActions> : null}
+          </ScreenMessage>
         </composables.Content>
       </composables.Layout>
     );

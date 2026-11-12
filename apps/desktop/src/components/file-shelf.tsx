@@ -4,7 +4,7 @@ import { Button } from '@desk-garage/ui/button';
 import { cn } from '@desk-garage/ui/cn';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 import { FileRow } from './file-row';
-import { ScreenMessage } from './screen-message';
+import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from './screen-message';
 
 export function FileShelf({ containerId, showAddButton = false }: { containerId: string; showAddButton?: boolean }) {
   const { containers, items, command, importDropped, isWorking } = useContainerWorkspace();
@@ -65,12 +65,14 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
       {files.length ? (
         files.map((item) => <FileRow key={item.id} item={item} />)
       ) : (
-        <ScreenMessage
-          icon={<Upload className="size-9" />}
-          title={name ? `No files in ${name}` : 'No files yet'}
-          description="Drag in the files you want close at hand, from anywhere in your workspace."
-          actions={
-            showAddButton ? (
+        <ScreenMessage>
+          <ScreenMessageIcon>
+            <Upload className="size-9" />
+          </ScreenMessageIcon>
+          <ScreenMessageTitle>{name ? `No files in ${name}` : 'No files yet'}</ScreenMessageTitle>
+          <ScreenMessageDescription>Drag in the files you want close at hand, from anywhere in your workspace.</ScreenMessageDescription>
+          {showAddButton ? (
+            <ScreenMessageActions>
               <Button
                 disabled={isWorking}
                 onClick={() => {
@@ -80,9 +82,9 @@ export function FileShelf({ containerId, showAddButton = false }: { containerId:
                 <FilePlus2 />
                 Add files
               </Button>
-            ) : undefined
-          }
-        />
+            </ScreenMessageActions>
+          ) : null}
+        </ScreenMessage>
       )}
     </section>
   );

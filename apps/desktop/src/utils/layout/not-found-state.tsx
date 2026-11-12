@@ -1,6 +1,6 @@
 import { FolderSearch } from 'lucide-react';
 import { createProp } from '@jfdevelops/react-layout';
-import { ScreenMessage } from '../../components/screen-message';
+import { ScreenMessage, ScreenMessageActions, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from '../../components/screen-message';
 import { createRenderState } from './base';
 
 export const notFoundState = createRenderState({
@@ -14,12 +14,14 @@ export const notFoundState = createRenderState({
     return (
       <composables.Layout className="min-h-full">
         <composables.Content>
-          <ScreenMessage
-            icon={<FolderSearch className="size-9" />}
-            title="Container not found"
-            description="It isn't on this device, or it is in the trash."
-            actions={actions}
-          />
+          <ScreenMessage>
+            <ScreenMessageIcon>
+              <FolderSearch className="size-9" />
+            </ScreenMessageIcon>
+            <ScreenMessageTitle>Container not found</ScreenMessageTitle>
+            <ScreenMessageDescription>It isn't on this device, or it is in the trash.</ScreenMessageDescription>
+            {actions ? <ScreenMessageActions>{actions}</ScreenMessageActions> : null}
+          </ScreenMessage>
         </composables.Content>
       </composables.Layout>
     );

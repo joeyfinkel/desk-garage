@@ -1,7 +1,7 @@
 import { Archive, RotateCcw, Trash2 } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { useContainerWorkspace } from '../routes/-utils/containers';
-import { ScreenMessage } from './screen-message';
+import { ScreenMessage, ScreenMessageDescription, ScreenMessageIcon, ScreenMessageTitle } from './screen-message';
 
 export function TrashList() {
   const { containers, items, restoreContainer, command, isWorking } = useContainerWorkspace();
@@ -48,11 +48,13 @@ export function TrashList() {
             ))}
           </>
         ) : (
-          <ScreenMessage
-            icon={<Trash2 className="size-9" />}
-            title="Trash is empty"
-            description="Deleted containers and files stay here until you restore them."
-          />
+          <ScreenMessage>
+            <ScreenMessageIcon>
+              <Trash2 className="size-9" />
+            </ScreenMessageIcon>
+            <ScreenMessageTitle>Trash is empty</ScreenMessageTitle>
+            <ScreenMessageDescription>Deleted containers and files stay here until you restore them.</ScreenMessageDescription>
+          </ScreenMessage>
         )}
       </div>
     </>
