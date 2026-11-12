@@ -1,6 +1,27 @@
 import { spawn, spawnSync } from 'node:child_process';
+import { copyFileSync, existsSync, utimesSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite-plus';
 import electron from 'electron';
+
+if (process.platform === 'darwin') {
+  const appBundle = join(dirname(electron), '..', '..');
+  const installedIcon = join(appBundle, 'Contents', 'Resources', 'electron.icns');
+  const appIcon = fileURLToPath(new URL('../electron/icon.icns', import.meta.url));
+
+  if (existsSync(installedIcon) && existsSync(appIcon)) {
+    copyFileSync(appIcon, installedIcon);
+    const now = new Date();
+    utimesSync(appBundle, now, now);
+    utimesSync(installedIcon, now, now);
+    spawnSync(
+      '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister',
+      ['-f', appBundle],
+      { stdio: 'ignore' },
+    );
+  }
+}
 
 if (!process.env.PORTLESS_URL || !process.env.PORT) {
   throw new Error('Start the desktop app with pnpm dev from the workspace root (Portless is required).');

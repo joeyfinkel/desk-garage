@@ -39,7 +39,6 @@ if (!app.requestSingleInstanceLock()) {
 
     const windows = createWorkspaceWindows(hasDialog);
     const icon = nativeImage.createFromPath(iconPath);
-    icon.setTemplateImage(true);
     tray = new Tray(icon);
     const menu = Menu.buildFromTemplate([
       { label: 'Quick access', click: () => windows.showQuick(tray) },

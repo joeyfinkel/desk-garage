@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
+import { applyDockIcon } from './app-icon';
 import type { Tray } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { STATUS_ITEM_ACTIVATE_GRACE_MS, shouldOpenMainWindow, statusItemSuppressUntil } from './menu-bar-app';
@@ -34,6 +35,7 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
       minWidth: isQuick ? 320 : 740,
       minHeight: isQuick ? 300 : 540,
       title: isQuick ? 'DeskGarage Quick Access' : 'DeskGarage',
+      icon: fileURLToPath(new URL('../electron/icon.png', import.meta.url)),
       show: false,
       backgroundColor: '#f7f7f4',
       frame: !isQuick,
@@ -77,6 +79,7 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
   function showMain(containerId?: string) {
     if (process.platform === 'darwin') {
       app.setActivationPolicy('regular');
+      applyDockIcon();
     }
 
     quick?.hide();
@@ -92,6 +95,7 @@ export function createWorkspaceWindows(hasDialog: (window: BrowserWindow) => boo
         }
       });
       main.once('ready-to-show', () => {
+        applyDockIcon();
         main?.show();
         main?.focus();
       });

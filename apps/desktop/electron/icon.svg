@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <title>Black and white garage with an open file drawer</title>
+  <g stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 79 70 96V215L29 190Q26 188 26 182Z" fill="#fff" />
+    <path d="M18 72 83 28Q90 23 101 25L147 34 70 102 18 83Q13 81 18 72Z" fill="#fff" />
+    <path d="m23 78 43 15" stroke-width="3" />
+    <path d="M69 94 147 43 218 90V198L69 217Z" fill="#fff" />
+    <path d="M89 207V108Q89 99 99 98L192 91 Q203 90 203 101V194Z" fill="#000" />
+    <path d="M67 101V94Q67 87 74 82L135 39 Q147 30 160 38L222 77Q230 82 229 94 L158 50Q148 44 139 50Z" fill="#fff" />
+    <path d="m92 105 109-8v17l-109 9Z" fill="#fff" stroke-width="3" />
+    <path d="m94 113 105-8" stroke-width="3" />
+    <path d="m92 156 109-10v8L92 165Z" fill="#fff" stroke-width="3" />
+    <path d="m99 148 2-18 9-1 4 4 19-2-4 21-30 3Z" fill="#fff" stroke-width="3" />
+    <path d="m143 125 27-2v25l-27 3Z" fill="#fff" stroke-width="3" />
+    <path d="m147 129 19-2v17l-19 2Z" fill="#000" stroke="none" />
+    <circle cx="160" cy="132" r="3" fill="#fff" stroke="none" />
+    <path d="m147 146 7-11 5 6 4-4 3 7Z" fill="#fff" stroke="none" />
+    <g stroke="#fff" stroke-width="3.5">
+      <path d="m184 135-3 3a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 0" />
+      <path d="m181 127 3-3a5 5 0 0 1 7 7l-6 6a5 5 0 0 1-7 0" />
+    </g>
+    <path d="m91 190 110-15 33 24-93 39-50-34Z" fill="#000" />
+    <path d="m164 191v-24q0-5 5-6l28-5 5 4 12-2v35Z" fill="#fff" stroke-width="3" />
+    <path d="m171 195v-23l26-5 5 4 15-3v29Z" fill="#fff" stroke-width="3" />
+    <path d="m105 198v-25l14-3 5 4 28-5v34Z" fill="#fff" stroke-width="3" />
+    <path d="m115 205v-25l15-3 5 4 26-5v33Z" fill="#fff" stroke-width="3" />
+    <path d="m125 211v-25l14-3 5 4 25-5v32Z" fill="#fff" stroke-width="3" />
+    <path d="m190 203v-30l35-8v31Z" fill="#fff" stroke-width="3" />
+    <path d="m196 179 23-5m-23 12 23-5" stroke-width="3" />
+    <path d="m138 222v-29l14-4 6 5 28-7v31Z" fill="#fff" stroke-width="3" />
+    <path d="m144 216v-17l10-3" stroke-width="3" />
+    <path d="m91 191 50 30v21l-50-34Z" fill="#fff" stroke-width="4" />
+    <path d="m141 218 98-31v35q0 6-6 8l-92 28Z" transform="translate(0 -14)" fill="#fff" />
+    <path d="m146 207 87-27" stroke-width="3" />
+    <path d="M180 214q0 6 7 4l21-7q5-2 4-8" stroke-width="10" />
+    <path d="M180 213q0 5 7 3l21-7q3-1 3-6" stroke="#fff" stroke-width="4" />
+  </g>
+</svg>
