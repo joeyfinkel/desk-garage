@@ -1,7 +1,7 @@
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { ReactLayoutDevtoolsContent } from '@jfdevelops/react-layout-devtools-react';
-import { workspaceLayout } from '../../utils/layout';
+import { workspaceLayout } from '../../utils/layout/layout';
 
 export default function Devtools() {
   return (

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Container } from '@desk-garage/containers';
 import { Plus } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
+import { cn } from '@desk-garage/ui/cn';
 import { Input } from '@desk-garage/ui/input';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 
@@ -15,13 +16,16 @@ export function ContainerForm({
   cancel: ReactNode;
   container?: Container;
 }) {
+  const formId = useId();
+  const nameId = `${formId}-name`;
+  const descriptionId = `${formId}-description`;
   const [name, setName] = useState(container?.name ?? '');
   const [description, setDescription] = useState(container?.description ?? '');
-  const { addContainer, command, isWorking } = useContainerWorkspace();
+  const { addContainer, command, isWorking, storageError } = useContainerWorkspace();
 
   return (
     <form
-      className="max-w-md rounded-xl border bg-card p-6"
+      className={cn('w-full', !container && 'max-w-md')}
       onSubmit={async (event) => {
         event.preventDefault();
         const id = container
@@ -33,11 +37,11 @@ export function ContainerForm({
         }
       }}
     >
-      <label htmlFor="container-name" className="text-sm font-medium">
+      <label htmlFor={nameId} className="text-sm font-medium">
         Container name
       </label>
       <Input
-        id="container-name"
+        id={nameId}
         className="mt-3"
         placeholder="e.g. Work essentials"
         value={name}
@@ -46,17 +50,22 @@ export function ContainerForm({
         required
         onChange={(event) => setName(event.target.value)}
       />
-      <label htmlFor="container-description" className="mt-5 block text-sm font-medium">
+      <label htmlFor={descriptionId} className="mt-5 block text-sm font-medium">
         Description <span className="font-normal text-muted-foreground">(optional)</span>
       </label>
       <textarea
-        id="container-description"
+        id={descriptionId}
         className="mt-2 min-h-24 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         value={description}
         maxLength={1000}
         placeholder="What do you keep here?"
         onChange={(event) => setDescription(event.target.value)}
       />
+      {storageError && (
+        <p role="alert" className="mt-4 text-sm text-destructive">
+          {storageError}
+        </p>
+      )}
       <div className="mt-6 flex gap-2">
         <Button type="submit" disabled={!name.trim() || isWorking}>
           {!container && <Plus />}

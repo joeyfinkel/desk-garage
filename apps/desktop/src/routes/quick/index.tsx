@@ -1,22 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Button } from '@desk-garage/ui/button';
 import { FileShelf } from '../../components/file-shelf';
-import { useContainerWorkspace } from '../-utils/containers';
 import { useQuickContainer } from './-utils/container';
 
 export const Route = createFileRoute('/quick/')({ component: QuickFiles });
 
 function QuickFiles() {
   const { selected } = useQuickContainer();
-  const { isLoading } = useContainerWorkspace();
-
-  if (isLoading) {
-    return (
-      <p role="status" className="p-4 text-sm text-muted-foreground">
-        Loading your garage…
-      </p>
-    );
-  }
 
   if (!selected) {
     return (

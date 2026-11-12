@@ -139,6 +139,68 @@ describe('desktop routes', () => {
       expect(actions.map((button) => button.textContent)).toEqual(['Add file', 'Edit container', 'Delete container']);
       await act(async () => actions[0]?.click());
       expect(commands).toContainEqual({ type: 'pickFiles', containerId: 'everyday' });
+      await act(async () => trigger?.click());
+      const edit = Array.from(document.querySelectorAll('[data-slot="popover-content"] button')).find(
+        (button) => button.textContent === 'Edit container',
+      );
+      await act(async () => edit?.dispatchEvent(new MouseEvent('click', { bubbles: true })));
+      const dialog = document.querySelector('[data-slot="dialog-content"]');
+      expect(dialog?.getAttribute('role')).toBe('dialog');
+      expect(dialog?.textContent).toContain('Edit container');
+      expect(document.querySelector('[data-slot="sheet-content"]')).toBeNull();
+      const name = dialog?.querySelector<HTMLInputElement>('input');
+      expect(name?.value).toBe('Everyday');
+      const cancel = Array.from(dialog?.querySelectorAll('button') ?? []).find((button) => button.textContent === 'Cancel');
+      await act(async () => cancel?.click());
+      expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull();
+    } finally {
+      await act(async () => root.unmount());
+      element.remove();
+      delete window.deskGarage;
+    }
+  });
+
+  it('shows loading, recoverable storage errors, then not found only after a successful read', async () => {
+    let completeLoad: ((response: WorkspaceResponse) => void) | undefined;
+    const command = vi.fn(
+      () =>
+        new Promise<WorkspaceResponse>((resolve) => {
+          completeLoad = resolve;
+        }),
+    );
+    window.deskGarage = {
+      command,
+      importDropped: async () => ({ ok: false, error: 'unused' }),
+      dragFile: () => {},
+      openMain: async () => {},
+      hideQuick: () => {},
+      onChanged: () => () => {},
+    };
+    localStorage.clear();
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+    const router = makeRouter('/containers/missing');
+    await router.load();
+    const element = document.createElement('div');
+    document.body.append(element);
+    const root = createRoot(element);
+
+    try {
+      await act(async () => root.render(createElement(RouterProvider, { router })));
+      expect(element.querySelector('[role="status"]')?.textContent).toContain('Loading your garage');
+      expect(element.textContent).not.toContain('Container not found');
+      await act(async () => completeLoad?.({ ok: false, error: 'Disk unavailable. Saved data is preserved.' }));
+      expect(element.querySelector('[role="alert"]')?.textContent).toContain('Disk unavailable');
+      expect(element.textContent).not.toContain('Container not found');
+      expect(element.textContent).not.toContain('Create a container to get started');
+      const retry = Array.from(element.querySelectorAll('button')).find((button) => button.textContent === 'Try again');
+      expect(retry).toBeDefined();
+      await act(async () => retry?.click());
+      expect(command).toHaveBeenCalledTimes(2);
+      expect(element.querySelector('[role="status"]')).not.toBeNull();
+      await act(async () => completeLoad?.({ ok: true, value: { version: 1, revision: 0, containers: [], items: [] } }));
+      expect(element.textContent).toContain('Container not found');
+      expect(element.textContent).toContain('Look in trash');
+      expect(element.querySelector('[role="alert"]')).toBeNull();
     } finally {
       await act(async () => root.unmount());
       element.remove();

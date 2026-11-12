@@ -33,13 +33,19 @@ export function useContainers() {
     return result.success;
   }, []);
 
-  useEffect(() => {
-    isMounted.current = true;
+  const reload = useCallback(() => {
+    setState((current) => ({ ...current, isLoading: current.workspace.revision < 0, storageError: '' }));
     const initial = Effect.try({
       try: () => localStorage.getItem('desk-garage:containers:v1'),
       catch: (cause) => new WorkspaceError({ message: 'Existing local containers could not be read for migration.', cause }),
     }).pipe(Effect.flatMap((legacyContainers) => runWorkspaceCommand({ type: 'load', legacyContainers })));
-    void run(initial);
+
+    return run(initial);
+  }, [run]);
+
+  useEffect(() => {
+    isMounted.current = true;
+    void reload();
     const unsubscribe = window.deskGarage?.onChanged(() => {
       void run(runWorkspaceCommand({ type: 'load' }));
     });
@@ -48,7 +54,7 @@ export function useContainers() {
       isMounted.current = false;
       unsubscribe?.();
     };
-  }, [run]);
+  }, [reload, run]);
 
   function command(command: WorkspaceCommand) {
     return run(runWorkspaceCommand(command));
@@ -88,6 +94,8 @@ export function useContainers() {
     items: state.workspace.items,
     storageError: state.storageError,
     isLoading: state.isLoading,
+    hasLoaded: state.workspace.revision >= 0,
+    reload,
     isWorking: state.pending > 0,
     addContainer,
     trashContainer,

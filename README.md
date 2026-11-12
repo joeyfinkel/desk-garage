@@ -15,7 +15,7 @@ Shared code belongs in packages. Native mobile components will consume the same 
 
 ## Layouts
 
-The desktop uses `@jfdevelops/react-layout` with a central resource definition in `apps/desktop/src/utils/layout.tsx` and page factories beside their routes under `apps/desktop/src/routes`. Semantic layout regions wrap shared primitives from `packages/ui/src/layout`. Add page configuration through the central factory and keep application behavior in services and hooks.
+The desktop uses `@jfdevelops/react-layout` with a central resource definition in `apps/desktop/src/utils/layout/base.tsx` and page factories beside their routes under `apps/desktop/src/routes`. Semantic layout regions wrap shared primitives from `packages/ui/src/layout`. Bind page titles and descriptions in route-local configs through the central factory (`forResource` when creating related pages). The base uses `createDefinedResourceLayout` to bind resources, options, and composables. Separate `createRenderState` fragments compose the shared `Layout`, default, loading, error, and not-found views in `utils/layout/layout.tsx`; the default state reuses `layoutState.asComposable()`. Each desktop route composes its own page in route-private routing modules, with a content state and explicit pending/error/not-found adapters for TanStack Router. Runtime content belongs in slots, while application behavior stays in services and hooks. Both window shells gate their content on the initial workspace read, with retry for failures and separate messages for failed operations. Container editing uses a shared shadcn dialog.
 
 ## Routing
 

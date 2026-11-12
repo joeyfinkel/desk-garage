@@ -1,11 +1,11 @@
 import type { Container } from '@desk-garage/containers';
 import { Button } from '@desk-garage/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@desk-garage/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@desk-garage/ui/dialog';
 import { ContainerForm } from '../../../components/container-form';
 
 export function ContainerEdit({ container, onClose }: { container: Container | undefined; onClose: () => void }) {
   return (
-    <Sheet
+    <Dialog
       open={!!container}
       onOpenChange={(open) => {
         if (!open) {
@@ -13,13 +13,13 @@ export function ContainerEdit({ container, onClose }: { container: Container | u
         }
       }}
     >
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit container</SheetTitle>
-          <SheetDescription>Update its name and optional description.</SheetDescription>
-        </SheetHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit container</DialogTitle>
+          <DialogDescription>Update its name and optional description.</DialogDescription>
+        </DialogHeader>
         {container && (
-          <div className="p-4">
+          <div>
             <ContainerForm
               key={container.id}
               container={container}
@@ -32,7 +32,7 @@ export function ContainerEdit({ container, onClose }: { container: Container | u
             />
           </div>
         )}
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

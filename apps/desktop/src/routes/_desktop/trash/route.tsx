@@ -1,13 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { TrashPage } from './-components/page';
-import { TrashList } from '../../../components/trash-list';
+import { ResourcePage } from './-utils/routing/layout';
 
-export const Route = createFileRoute('/_desktop/trash')({ component: Trash });
-
-function Trash() {
-  return (
-    <TrashPage title="Trash">
-      <TrashList />
-    </TrashPage>
-  );
-}
+export const Route = createFileRoute('/_desktop/trash')({
+  component: function Page() {
+    return <ResourcePage />;
+  },
+  pendingComponent: function Loading() {
+    return <ResourcePage.Loading />;
+  },
+  errorComponent: function Error() {
+    return <ResourcePage.Error />;
+  },
+  notFoundComponent: function NotFound() {
+    return <ResourcePage.NotFound />;
+  },
+});

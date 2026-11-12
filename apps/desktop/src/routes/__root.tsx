@@ -11,11 +11,6 @@ function RootRoute() {
 
   return (
     <ContainersContext.Provider value={workspace}>
-      {workspace.storageError && (
-        <p role="alert" className="p-4 text-sm text-destructive">
-          {workspace.storageError}
-        </p>
-      )}
       <Outlet />
     </ContainersContext.Provider>
   );

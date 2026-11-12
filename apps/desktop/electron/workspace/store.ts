@@ -179,9 +179,11 @@ export function createWorkspaceStore(root: string) {
             write: (value) =>
               Schema.decodeUnknownEffect(Schema.fromJsonString(Containers))(value).pipe(
                 Effect.mapError((cause) => new ContainerError({ operation: 'write', message: 'Container metadata is invalid.', cause })),
-                Effect.map((containers) => {
-                  next = { ...workspace, containers };
-                }),
+                Effect.andThen((containers) =>
+                  Effect.sync(() => {
+                    next = { ...workspace, containers };
+                  }),
+                ),
               ),
           });
           const operation =

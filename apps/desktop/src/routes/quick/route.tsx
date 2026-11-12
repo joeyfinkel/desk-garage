@@ -1,4 +1,7 @@
+import { WorkspaceBoundary } from '../../components/workspace-boundary';
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
+import { RouteError } from '../-components/route-error';
+import { NotFound } from '../-components/not-found';
 import { Expand, House, Plus, Trash2, X } from 'lucide-react';
 import { Button } from '@desk-garage/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@desk-garage/ui/select';
@@ -8,6 +11,8 @@ import { useQuickContainer } from './-utils/container';
 export const Route = createFileRoute('/quick')({
   validateSearch: (search: Record<string, unknown>) => (typeof search.containerId === 'string' ? { containerId: search.containerId } : {}),
   component: QuickLayout,
+  errorComponent: RouteError,
+  notFoundComponent: NotFound,
 });
 
 function QuickLayout() {
@@ -89,7 +94,9 @@ function QuickLayout() {
         </Button>
       </nav>
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
-        <Outlet />
+        <WorkspaceBoundary>
+          <Outlet />
+        </WorkspaceBoundary>
       </main>
       <footer className="shrink-0 border-t px-3 py-2 text-[11px] text-muted-foreground">
         Private to this device · Changes are saved automatically

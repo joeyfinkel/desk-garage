@@ -1,7 +1,6 @@
-import { createResourceLayout } from '../../../../utils/layout';
+import { createResourceLayout } from '../../../../utils/layout/layout';
 
-export const ContainersPage = createResourceLayout({
-  resource: 'containers',
-  name: 'ContainersPage',
-  description: 'Keep the things you reach for close at hand.',
-});
+const createContainersPage = createResourceLayout.forResource({ resource: 'containers' });
+
+export const GaragePage = createContainersPage({ name: 'GaragePage', title: 'Your garage' });
+export const ContainerPage = createContainersPage({ name: 'ContainerPage', title: 'Container files' });

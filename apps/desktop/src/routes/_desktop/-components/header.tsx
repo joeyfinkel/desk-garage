@@ -10,7 +10,7 @@ export function DesktopHeader() {
   const isExpanded = isMobile ? openMobile : open;
   const { containers } = useContainerWorkspace();
   const match = matchRoute({ to: '/containers/$containerId' });
-  const selected = match && containers.find((container) => container.id === match.containerId && !container.deletedAt);
+  const selected = match && containers.find(({ id, deletedAt }) => id === match.containerId && !deletedAt);
   const title = matchRoute({ to: '/containers/new' })
     ? 'New container'
     : matchRoute({ to: '/trash' })
