@@ -44,6 +44,7 @@ it('describes DeskGarage and links both Mac downloads', () => {
   expect(view.querySelector('a[href$="arm64.zip"]')?.textContent).toBe('Download for Apple silicon');
   expect(view.querySelector('a[href$="x64.zip"]')?.textContent).toBe('Download for Intel');
   expect(view.textContent).toContain('Version 1.0.0-alpha.1');
+  expect(view.textContent).toContain('xattr -cr DeskGarage.app');
 });
 
 it('points at the releases list when a Mac zip is not available', () => {
