@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
-import type { FileItem } from '@desk-garage/workspace';
 import { Button } from '@desk-garage/ui/button';
+import type { FileItem } from '@desk-garage/workspace';
+import { ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useContainerWorkspace } from '../routes/-utils/containers';
-import { fileTypeDragImage } from './file-type-drag-image';
 import { FileMark } from './file-mark';
+import { fileTypeDragImage } from './file-type-drag-image';
 import { FileTypeIcon } from './file-type-icon';
 
 export function FileRow({ item }: { item: FileItem }) {
@@ -66,21 +66,46 @@ function StoredFileRow({ item }: { item: FileItem }) {
 
 function NoteRow({ item }: { item: FileItem }) {
   const { command, isWorking } = useContainerWorkspace();
-  const [draft, setDraft] = useState(item.body ?? '');
-  const [isCollapsed, setIsCollapsed] = useState(item.body !== '');
+  const savedBody = item.body ?? '';
+  const [edited, setEdited] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(savedBody !== '');
+  const draft = edited === null || edited === savedBody ? savedBody : edited;
+  const dirty = edited !== null && edited !== savedBody;
   const preview = draft.replace(/\s+/g, ' ').trim();
+  const commandRef = useRef(command);
+  const pendingRef = useRef({ id: item.id, body: draft, dirty });
+  commandRef.current = command;
+  pendingRef.current = { id: item.id, body: draft, dirty };
 
   useEffect(() => {
-    if (draft === (item.body ?? '')) {
+    if (edited !== null && edited === savedBody) {
+      setEdited(null);
+    }
+  }, [edited, savedBody]);
+
+  useEffect(() => {
+    if (!dirty) {
       return;
     }
 
     const handle = setTimeout(() => {
-      void command({ type: 'updateNote', id: item.id, body: draft });
+      void commandRef.current({ type: 'updateNote', id: item.id, body: draft });
     }, 400);
 
     return () => clearTimeout(handle);
-  }, [command, draft, item.body, item.id]);
+  }, [dirty, draft, item.id]);
+
+  useEffect(() => {
+    return () => {
+      const pending = pendingRef.current;
+
+      if (!pending.dirty) {
+        return;
+      }
+
+      void commandRef.current({ type: 'updateNote', id: pending.id, body: pending.body });
+    };
+  }, []);
 
   return (
     <div
@@ -143,7 +168,7 @@ function NoteRow({ item }: { item: FileItem }) {
           placeholder="Write something you can drag out and paste"
           className="mt-2 min-h-24 w-full resize-y bg-transparent text-sm outline-none"
           maxLength={20000}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => setEdited(event.target.value)}
         />
       )}
     </div>
