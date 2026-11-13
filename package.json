@@ -1,7 +1,7 @@
 {
   "name": "desk-garage",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0-alpha.0",
   "type": "module",
   "packageManager": "pnpm@10.33.2",
   "scripts": {
@@ -9,15 +9,23 @@
     "typecheck": "vp run -r typecheck",
     "test": "vp run -r test",
     "format": "biome format --write . && eslint --fix .",
-    "format:check": "biome format . && eslint ."
+    "format:check": "biome format . && eslint .",
+    "dev": "portless desk-garage pnpm --filter desk-garage-desktop dev",
+    "dev:desktop": "portless desk-garage pnpm --filter desk-garage-desktop dev",
+    "changeset": "changeset"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.4",
+    "@changesets/cli": "^3.0.3",
     "@jfdevelops/cli": "0.8.0",
-    "typescript": "^6.0.3",
-    "vite-plus": "^1.5.0",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^22.20.5",
     "eslint": "^10.14.0",
+    "jsdom": "31.0.0",
+    "portless": "^0.17.0",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
-    "@biomejs/biome": "^2.6.4"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vite-plus": "^1.5.0"
   }
 }

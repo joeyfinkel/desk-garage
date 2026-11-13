@@ -1,0 +1,141 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - alpha
+      - beta
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.pull_request.base.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Version packages
+        id: release
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          channel="$BASE_REF"
+          if [[ "$channel" == "main" ]]; then
+            channel="stable"
+          fi
+
+          changeset_count=0
+          for file in .changeset/*.md; do
+            if [[ "$(basename "$file")" != "README.md" ]]; then
+              changeset_count=$((changeset_count + 1))
+            fi
+          done
+
+          if [[ "$changeset_count" -eq 0 ]]; then
+            {
+              echo "publish=false"
+              echo "version="
+              echo "tag="
+              echo "prerelease=false"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$channel" == "stable" ]]; then
+            if [[ -f .changeset/pre.json ]]; then
+              pnpm exec changeset pre exit
+            fi
+          elif [[ -f .changeset/pre.json ]]; then
+            tag="$(node -e "process.stdout.write(require('./.changeset/pre.json').tag)")"
+            if [[ "$tag" != "$channel" ]]; then
+              pnpm exec changeset pre exit
+              pnpm exec changeset pre enter "$channel"
+            fi
+          else
+            pnpm exec changeset pre enter "$channel"
+          fi
+
+          before="$(node -e "process.stdout.write(require('./apps/desktop/package.json').version)")"
+          pnpm exec changeset version
+          after="$(node -e "process.stdout.write(require('./apps/desktop/package.json').version)")"
+          publish=false
+          prerelease=false
+          tag=""
+          if [[ "$before" != "$after" ]]; then
+            publish=true
+            tag="v$after"
+            if [[ "$after" == *-* ]]; then
+              prerelease=true
+            fi
+          fi
+          {
+            echo "publish=$publish"
+            echo "version=$after"
+            echo "tag=$tag"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build the desktop app
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm --filter desk-garage-desktop build
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Package the Mac download
+        if: steps.release.outputs.publish == 'true'
+        run: pnpm --filter desk-garage-desktop package
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Commit the version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .changeset package.json apps packages
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          tag="${{ steps.release.outputs.tag }}"
+          message="chore(release): prepare ${tag}"
+          if [[ -z "${tag}" ]]; then
+            message="chore(release): prepare package versions"
+          fi
+          git commit -m "${message}"
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}
+
+      - name: Publish the GitHub release
+        if: steps.release.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=(
+            release create "${{ steps.release.outputs.tag }}"
+            --target "$(git rev-parse HEAD)"
+            --title "DeskGarage ${{ steps.release.outputs.version }}"
+            --notes-file apps/desktop/CHANGELOG.md
+          )
+          if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          gh "${args[@]}" apps/desktop/release/*.zip

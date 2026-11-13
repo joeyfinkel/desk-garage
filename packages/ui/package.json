@@ -1,0 +1,43 @@
+{
+  "name": "@desk-garage/ui",
+  "private": true,
+  "version": "1.0.0-alpha.0",
+  "type": "module",
+  "exports": {
+    "./button": "./src/components/button.tsx",
+    "./input": "./src/components/input.tsx",
+    "./cn": "./src/lib/utils.ts",
+    "./styles.css": "./src/styles.css",
+    "./page-frame": "./src/layout/page-frame.tsx",
+    "./page-header": "./src/layout/page-header.tsx",
+    "./page-content": "./src/layout/page-content.tsx",
+    "./sidebar": "./src/components/sidebar/index.ts",
+    "./separator": "./src/components/separator/index.ts",
+    "./sheet": "./src/components/sheet/index.ts",
+    "./tooltip": "./src/components/tooltip/index.ts",
+    "./skeleton": "./src/components/skeleton/index.ts",
+    "./use-mobile": "./src/components/use-mobile/index.ts",
+    "./select": "./src/components/select/index.ts",
+    "./popover": "./src/components/popover/index.ts",
+    "./dialog": "./src/components/dialog/index.ts"
+  },
+  "dependencies": {
+    "@desk-garage/theme": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.577.0",
+    "radix-ui": "^1.4.3",
+    "tailwind-merge": "^3.5.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

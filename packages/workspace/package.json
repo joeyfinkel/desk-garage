@@ -1,0 +1,16 @@
+{
+  "name": "@desk-garage/workspace",
+  "private": true,
+  "version": "1.0.0-alpha.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@desk-garage/containers": "workspace:*",
+    "effect": "^4.1.4"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

@@ -131,21 +131,21 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "8f1dd9d4127828a0e05efc18389f8bb43966d60d7c1284e19127d24654f6831f"
+      "sha256": "e65105c80900898b4104ce20794b18f0f376b415a0b68a82b1baa5c5bbf920f0"
     },
     {
       "path": ".gitignore",
       "owner": {
         "type": "project"
       },
-      "sha256": "58aea3d6b4b0f8799c1e00c3b023898516997f6369ee8e13d8d4b4215f70a62b"
+      "sha256": "f08feabc628e858c2471e609f42e4aac09c6f0bf261ecfbdd10b50a7d95aa1ea"
     },
     {
       "path": "README.md",
       "owner": {
         "type": "project"
       },
-      "sha256": "ac2698e059fc766e1960ded8dc9907716e117735a13ab6c713a8dbb19f988e1d"
+      "sha256": "a95c61b303cbf0f2dc1f78f4aadc64c68794b20d1736606e8cc3f0a8adb790a4"
     },
     {
       "path": "apps/web/README.md",
@@ -215,7 +215,7 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "5bbb75d001920551b931faf2eec2025d31359fe71656f2f2ae12a52b476249d8"
+      "sha256": "c6d9f63e516e098cbcac16618dd011c51b9137bb7efe1f94e2a5a8118974a936"
     },
     {
       "path": "pnpm-workspace.yaml",

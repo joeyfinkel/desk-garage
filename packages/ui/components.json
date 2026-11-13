@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@desk-garage/ui/components",
+    "utils": "@desk-garage/ui/cn",
+    "ui": "@desk-garage/ui",
+    "lib": "@desk-garage/ui/lib",
+    "hooks": "@desk-garage/ui/hooks"
+  }
+}
