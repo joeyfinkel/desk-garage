@@ -6,7 +6,7 @@ TanStack Start app for the DeskGarage site. The landing page describes the deskt
 pnpm dev:web
 ```
 
-Portless serves the site at `https://desk-garage-web.localhost`. The page reads the newest GitHub release that includes Mac zip files. When that request fails, the download link goes to the releases list.
+Portless serves the site at `https://desk-garage-web.localhost`. The page reads the newest GitHub release that includes Mac zip files. When that request fails or times out, the page uses direct asset links from `src/release-snapshot.json`. The deployment job refreshes that snapshot with its GitHub token before building, so runtime GitHub API availability does not disable downloads.
 
 Production runs on Cloudflare Workers as `desk-garage-web`. `pnpm --filter desk-garage-web run build` builds the worker without Cloudflare credentials. `pnpm --filter desk-garage-web run preview` serves that build. `pnpm --filter desk-garage-web run deploy` publishes it. GitHub Actions publishes the same worker when `alpha` changes the site. That job needs the `CLOUDFLARE_API_TOKEN` repository secret, with Workers Scripts edit on this account.
 

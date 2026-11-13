@@ -32,6 +32,12 @@ jobs:
           node-version: "24"
           cache: true
 
+      - name: Refresh release download snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/joeyfinkel/desk-garage/releases --jq '[.[] | {tag_name,html_url,assets:[.assets[] | {name,browser_download_url}]}]' > apps/web/src/release-snapshot.json
+
       - name: Deploy
         run: pnpm --filter desk-garage-web run deploy
         env:
