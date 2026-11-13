@@ -17,7 +17,9 @@ function dragIcon(name: string) {
     return cached;
   }
 
-  const icon = nativeImage.createFromBuffer(renderFileTypeIconPng(name), { scaleFactor: 2 });
+  const icon = nativeImage.createFromBuffer(renderFileTypeIconPng(name), {
+    scaleFactor: 2,
+  });
   dragIcons.set(label, icon);
 
   return icon;
@@ -51,11 +53,15 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
       const command = await Effect.runPromise(
         Schema.decodeUnknownEffect(WorkspaceCommand)(input).pipe(
           Effect.mapError(
-            (cause) => new WorkspaceError({ message: 'This action is not available. Restart DeskGarage and try again.', cause }),
+            (cause) =>
+              new WorkspaceError({
+                message: 'This action is not available. Restart DeskGarage and try again.',
+                cause,
+              }),
           ),
         ),
       );
-      let operation;
+      let operation: ReturnType<typeof store.execute>;
 
       if (command.type === 'pickFiles') {
         const result = await withDialog(window, () =>
@@ -64,12 +70,24 @@ export function registerWorkspaceIpc(store: ReturnType<typeof createWorkspaceSto
             properties: ['openFile', 'multiSelections'],
           }),
         );
-        operation = result.canceled
-          ? store.execute({ type: 'load' })
-          : store.execute({ type: 'importFiles', containerId: command.containerId, paths: result.filePaths });
+
+        if (result.canceled) {
+          operation = store.execute({ type: 'load' });
+        } else {
+          operation = store.execute({
+            type: 'importFiles',
+            containerId: command.containerId,
+            paths: result.filePaths,
+          });
+        }
       } else if (command.type === 'exportItem') {
         const file = await Effect.runPromise(store.fileForItem(command.id));
-        const result = await withDialog(window, () => dialog.showSaveDialog(window, { title: 'Save a copy', defaultPath: file.item.name }));
+        const result = await withDialog(window, () =>
+          dialog.showSaveDialog(window, {
+            title: 'Save a copy',
+            defaultPath: file.item.name,
+          }),
+        );
 
         if (!result.canceled && result.filePath) {
           if (file.item.body != null) {
