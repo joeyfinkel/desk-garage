@@ -77,3 +77,21 @@ it.each(['rate-limit', 'server-error', 'network-error', 'empty', 'malformed'])(
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   },
 );
+
+it.each([true, false])('prefers DMGs over ZIPs regardless of asset order (%s)', (dmgFirst) => {
+  const dmgs = [arm64, intel].map((asset) => ({
+    name: asset.name.replace('.zip', '.dmg'),
+    browser_download_url: asset.browser_download_url.replace('.zip', '.dmg'),
+  }));
+  const assets = dmgFirst ? [...dmgs, ...release.assets] : [...release.assets, ...dmgs];
+  const downloads = downloadsFromReleases([{ ...release, assets }]);
+
+  expect(downloads.mac.map((item) => item.href)).toEqual(dmgs.map((asset) => asset.browser_download_url));
+});
+
+it('supports releases containing only DMGs', () => {
+  const asset = { name: arm64.name.replace('.zip', '.dmg'), browser_download_url: arm64.browser_download_url.replace('.zip', '.dmg') };
+  const downloads = downloadsFromReleases([{ ...release, assets: [asset] }]);
+
+  expect(downloads.mac).toEqual([{ arch: 'arm64', label: 'Download for Apple silicon', href: asset.browser_download_url }]);
+});

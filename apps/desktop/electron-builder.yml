@@ -15,6 +15,6 @@ mac:
   icon: electron/icon.icns
   category: public.app-category.productivity
   target:
-    - zip
+    - dmg
   identity: null
 artifactName: DeskGarage-${version}-${arch}.${ext}
