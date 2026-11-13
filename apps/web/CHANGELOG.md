@@ -1,5 +1,11 @@
 # desk-garage-web
 
+## 1.0.0-alpha.2
+
+### Patch Changes
+
+- 6d1b81f: Keep direct downloads available using a bundled release snapshot when the live GitHub API fails.
+
 ## 1.0.0-alpha.1
 
 ### Minor Changes
