@@ -20,9 +20,9 @@ export function DownloadLinks({ downloads }: { downloads: Downloads }) {
         Promise.resolve(data.getHighEntropyValues(['architecture']))
           .then((values: unknown) => {
             if (active && values && typeof values === 'object' && 'architecture' in values) {
-              if (values.architecture === 'arm') {
+              if (values.architecture === 'arm' && downloads.mac.some((item) => item.arch === 'arm64')) {
                 setArch('arm64');
-              } else if (values.architecture === 'x86') {
+              } else if (values.architecture === 'x86' && downloads.mac.some((item) => item.arch === 'x64')) {
                 setArch('x64');
               }
             }
@@ -34,13 +34,15 @@ export function DownloadLinks({ downloads }: { downloads: Downloads }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [downloads.mac]);
 
   return (
     <div id="download" className="flex max-w-xl flex-col items-start gap-3">
       {download ? (
         <Button asChild size="lg">
-          <a href={download.href}>{unsupported ? 'Download for macOS' : download.label}</a>
+          <a href={download.href} download>
+            {unsupported ? 'Download for macOS' : download.label}
+          </a>
         </Button>
       ) : (
         <Button size="lg" disabled>

@@ -43,6 +43,8 @@ it('describes DeskGarage and offers one direct Mac download', () => {
   expect(view.textContent).toContain('Stays in the menu bar');
   expect(view.textContent).toContain('Notes you can paste');
   expect(view.querySelector('a[href$="arm64.zip"]')?.textContent).toBe('Download for macOS');
+  expect(view.querySelector('a[href$="arm64.zip"]')?.hasAttribute('download')).toBe(true);
+  expect(view.querySelector('a[href$="arm64.zip"]')?.getAttribute('href')).toBe(downloads.mac[0]?.href);
   expect(view.querySelector('a[href$="x64.zip"]')).toBeNull();
   const select = view.querySelector('select');
 
@@ -85,6 +87,27 @@ it('selects the Intel download from browser architecture hints', async () => {
 
   expect(view?.querySelector('a[href$="x64.zip"]')?.textContent).toBe('Download for Intel');
   expect(view?.querySelector('a[href$="arm64.zip"]')).toBeNull();
+});
+
+it.each([
+  { available: 'arm64', detected: 'x86' },
+  { available: 'x64', detected: 'arm' },
+])('keeps the available $available download when the browser reports $detected', async ({ available, detected }) => {
+  vi.stubGlobal('navigator', {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+    maxTouchPoints: 0,
+    userAgentData: { getHighEntropyValues: async () => ({ architecture: detected }) },
+  });
+  const availableDownloads = downloads.mac.filter((item) => item.arch === available);
+  let view: HTMLElement | undefined;
+
+  await act(async () => {
+    view = render(createElement(LandingPage, { downloads: { ...downloads, mac: availableDownloads } }));
+  });
+
+  expect(view?.querySelector(`a[href$="${available}.zip"]`)).not.toBeNull();
+  expect(view?.textContent).not.toContain('Download unavailable');
+  expect(view?.querySelector('select')).toBeNull();
 });
 
 function render(element: ReactElement) {
