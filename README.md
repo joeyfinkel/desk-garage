@@ -5,7 +5,7 @@ A private home for the files, links, and snippets you reach for often.
 ## Workspace
 
 - `apps/desktop`: Electron + React desktop app, shared by macOS and Windows.
-- `apps/web`: existing website placeholder.
+- `apps/web`: TanStack Start site. The landing page describes DeskGarage and links to the Mac download. The web client will live in this same app.
 - `packages/containers`: Effect schemas, typed errors, storage service, and container operations.
 - `packages/workspace`: shared workspace/file schemas, bridge contracts, and typed errors.
 - `packages/ui`: shadcn components, `cn`, and shared Tailwind styles.
@@ -47,6 +47,14 @@ Private containers support file import through the native picker or drag and dro
 Drag a saved file out or use **Save a copy** to export it. Removing a file moves it to recoverable trash. Removing a container hides its files together; restoring it preserves any files that were already individually trashed. Restore a container before recovering its individually trashed files. Permanent deletion, sync, authentication, mobile, and distribution packaging are upcoming work.
 
 `pnpm dev` builds the native TypeScript entry before opening Electron. Restart it after main-process or preload edits. Renderer edits hot reload through Portless.
+
+## Website
+
+```sh
+pnpm dev:web
+```
+
+Portless serves the site at `https://desk-garage-web.localhost`. The landing page reads the newest GitHub release that includes Mac zip files and links the Apple silicon and Intel downloads. When that request fails, the page links to the releases list. The TanStack Start plugin generates `apps/web/src/route-tree.gen.ts`; commit that file and do not edit it by hand.
 
 ## Development tools
 

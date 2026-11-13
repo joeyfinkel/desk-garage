@@ -11,7 +11,8 @@
       "!bun.lock",
       "!**/dist/**",
       "!**/route-tree.gen.ts",
-      "!**/dist-electron/**"
+      "!**/dist-electron/**",
+      "!**/.output/**"
     ]
   },
   "formatter": {

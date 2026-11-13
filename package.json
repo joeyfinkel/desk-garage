@@ -12,6 +12,7 @@
     "format:check": "biome format . && eslint .",
     "dev": "portless desk-garage pnpm --filter desk-garage-desktop dev",
     "dev:desktop": "portless desk-garage pnpm --filter desk-garage-desktop dev",
+    "dev:web": "portless desk-garage-web pnpm --filter desk-garage-web dev",
     "changeset": "changeset"
   },
   "devDependencies": {
