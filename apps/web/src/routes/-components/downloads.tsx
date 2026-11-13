@@ -1,18 +1,69 @@
 import { Button } from '@desk-garage/ui/button';
-import type { Downloads } from '../../downloads';
+import { useEffect, useState } from 'react';
+import type { Downloads, MacArch } from '../../downloads';
 
 export function DownloadLinks({ downloads }: { downloads: Downloads }) {
-  const links = downloads.mac.length > 0 ? downloads.mac : [{ label: 'See downloads', href: downloads.releaseUrl }];
+  const [arch, setArch] = useState<MacArch>(downloads.mac[0]?.arch ?? 'arm64');
+  const [unsupported, setUnsupported] = useState(false);
+  const download = downloads.mac.find((item) => item.arch === arch);
+
+  useEffect(() => {
+    let active = true;
+    const isMac = /Macintosh|Mac OS X/.test(navigator.userAgent) && navigator.maxTouchPoints < 2;
+
+    setUnsupported(!isMac);
+
+    if (isMac && 'userAgentData' in navigator) {
+      const data = navigator.userAgentData;
+
+      if (data && typeof data === 'object' && 'getHighEntropyValues' in data && typeof data.getHighEntropyValues === 'function') {
+        Promise.resolve(data.getHighEntropyValues(['architecture']))
+          .then((values: unknown) => {
+            if (active && values && typeof values === 'object' && 'architecture' in values) {
+              if (values.architecture === 'arm') {
+                setArch('arm64');
+              } else if (values.architecture === 'x86') {
+                setArch('x64');
+              }
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div id="download" className="flex max-w-xl flex-col items-start gap-3">
-      <div className="flex flex-wrap gap-3">
-        {links.map((link, index) => (
-          <Button key={link.href} asChild size="lg" variant={index === 0 ? 'default' : 'outline'}>
-            <a href={link.href}>{link.label}</a>
-          </Button>
-        ))}
-      </div>
+      {download ? (
+        <Button asChild size="lg">
+          <a href={download.href}>{unsupported ? 'Download for macOS' : download.label}</a>
+        </Button>
+      ) : (
+        <Button size="lg" disabled>
+          Download unavailable
+        </Button>
+      )}
+      {downloads.mac.length > 1 ? (
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          Mac processor
+          <select
+            aria-label="Mac processor"
+            className="rounded-md border border-border bg-background px-2 py-1 text-foreground"
+            value={arch}
+            onChange={(event) => setArch(event.target.value === 'x64' ? 'x64' : 'arm64')}
+          >
+            <option value="arm64">Apple silicon</option>
+            <option value="x64">Intel</option>
+          </select>
+        </label>
+      ) : null}
+      <p className="text-sm text-muted-foreground">
+        {unsupported ? 'Available for macOS only. ' : 'Check your Mac processor if it was not detected correctly. '}
+      </p>
       <p className="text-sm text-muted-foreground">
         {downloads.version ? `Version ${downloads.version}. ` : null}
         {downloads.mac.length > 0 ? (

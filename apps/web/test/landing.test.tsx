@@ -2,7 +2,7 @@
 
 import { act, createElement, type ReactElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, expect, it } from 'vite-plus/test';
+import { afterEach, expect, it, vi } from 'vite-plus/test';
 import type { Downloads } from '../src/downloads';
 import { LandingPage } from '../src/routes/-components/page';
 
@@ -33,29 +33,58 @@ afterEach(() => {
   });
   root = undefined;
   document.body.replaceChildren();
+  vi.unstubAllGlobals();
 });
 
-it('describes DeskGarage and links both Mac downloads', () => {
+it('describes DeskGarage and offers one direct Mac download', () => {
   const view = render(createElement(LandingPage, { downloads }));
 
   expect(view.textContent).toContain('A private home for the files and notes you reach for often.');
   expect(view.textContent).toContain('Stays in the menu bar');
   expect(view.textContent).toContain('Notes you can paste');
-  expect(view.querySelector('a[href$="arm64.zip"]')?.textContent).toBe('Download for Apple silicon');
-  expect(view.querySelector('a[href$="x64.zip"]')?.textContent).toBe('Download for Intel');
+  expect(view.querySelector('a[href$="arm64.zip"]')?.textContent).toBe('Download for macOS');
+  expect(view.querySelector('a[href$="x64.zip"]')).toBeNull();
+  const select = view.querySelector('select');
+
+  act(() => {
+    if (select) {
+      select.value = 'x64';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  expect(view.querySelector('a[href$="x64.zip"]')).not.toBeNull();
+  expect(view.querySelector('a[href$="arm64.zip"]')).toBeNull();
   expect(view.textContent).toContain('Version 1.0.0-alpha.1');
   expect(view.textContent).toContain('xattr -cr DeskGarage.app');
 });
 
-it('points at the releases list when a Mac zip is not available', () => {
+it('disables downloading when no Mac zip is available', () => {
   const view = render(
     createElement(LandingPage, {
       downloads: { version: null, releaseUrl: 'https://github.com/joeyfinkel/desk-garage/releases', mac: [] },
     }),
   );
 
-  expect(view.querySelector('a[href="https://github.com/joeyfinkel/desk-garage/releases"]')?.textContent).toBe('See downloads');
+  expect(view.querySelector('button')?.disabled).toBe(true);
+  expect(view.textContent).not.toContain('See downloads');
   expect(view.textContent).toContain('published with each GitHub release');
+});
+
+it('selects the Intel download from browser architecture hints', async () => {
+  vi.stubGlobal('navigator', {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+    maxTouchPoints: 0,
+    userAgentData: { getHighEntropyValues: async () => ({ architecture: 'x86' }) },
+  });
+  let view: HTMLElement | undefined;
+
+  await act(async () => {
+    view = render(createElement(LandingPage, { downloads }));
+  });
+
+  expect(view?.querySelector('a[href$="x64.zip"]')?.textContent).toBe('Download for Intel');
+  expect(view?.querySelector('a[href$="arm64.zip"]')).toBeNull();
 });
 
 function render(element: ReactElement) {
