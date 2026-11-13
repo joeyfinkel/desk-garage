@@ -138,84 +138,63 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "f08feabc628e858c2471e609f42e4aac09c6f0bf261ecfbdd10b50a7d95aa1ea"
+      "sha256": "f139cc572dc9bae58b3b030192fa1e3a41a482bddc0e454ccf32b6ff74275bdb"
     },
     {
       "path": "README.md",
       "owner": {
         "type": "project"
       },
-      "sha256": "a95c61b303cbf0f2dc1f78f4aadc64c68794b20d1736606e8cc3f0a8adb790a4"
+      "sha256": "a9d63f8ca2d47f44fb67e1d682e4cae070a03b1a087246cc5a788e39bd48413e"
     },
     {
       "path": "apps/web/README.md",
       "owner": {
         "type": "project"
       },
-      "sha256": "762f109889e05381cbf6f08d4716a70f9fa8687d4d7f557dec0506759f49eaee"
+      "sha256": "1357da1218c2ed085afbfe45dabf527d203642b8f35468a813b82ea5a743bb2d"
     },
     {
       "path": "apps/web/package.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "e4f48e98753e173c22b66e93be7b3b909faba66a857af5fdf39e7d2e012b9c7a"
-    },
-    {
-      "path": "apps/web/src/index.ts",
-      "owner": {
-        "type": "project"
-      },
-      "sha256": "476ef582fc5eb1acb4f2554659b10635b0b409a156eb43b18dea1bdcbf18f9b9"
-    },
-    {
-      "path": "apps/web/test/index.test.ts",
-      "owner": {
-        "type": "project"
-      },
-      "sha256": "2e309118a585b3d8b7bf5c6e3115f34dce375574f81addd99cb2bdfbb5a45d1f"
-    },
-    {
-      "path": "apps/web/tsconfig.build.json",
-      "owner": {
-        "type": "project"
-      },
-      "sha256": "563beb8975bba0464056eda8122977378769230982b0dd66f6a624ac72bb7b83"
+      "sha256": "b8d6633cfac35475292b1328158d4175f944ef0cb5dfdecf74d963a14235af57"
     },
     {
       "path": "apps/web/tsconfig.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "72d3479be64b60fd95367d1ae42021c83d7901db71f16cad6998fbc2559f9880"
+      "sha256": "5e0d1be31108d2a3dd483a540403309f5864084a1e2fe4fb7f2f923ef7e4d92e"
     },
     {
       "path": "apps/web/vite.config.ts",
       "owner": {
         "type": "project"
       },
-      "sha256": "c885a42d063f2cf2117fa706265e9a0f92a1ce26cd7d0637d7631ca04094deca"
+      "sha256": "6a457f7ca80d3c599bdce8cf69d54a3b6ed5e23e8b7de3a9ede6eba358245123"
     },
     {
       "path": "biome.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "1804bc010c64df9c3374a3c8f6f6fcc2a6d5b77339437616136c57b25e87eeed"
+      "sha256": "fdce688ba73cb4b14ad628430fc4d0c3b08da165752085c443fe56915735acae"
     },
     {
       "path": "eslint.config.js",
       "owner": {
         "type": "project"
       },
-      "sha256": "230134cdd8bad9a668b0c4eeb8b86dd5a5e6bcf07daa040d51de20befa4bf678"
+      "sha256": "928e81c244e77591b9f9c6de72a7d10a0a1b144f56248235e23d915ad809cc94"
     },
     {
       "path": "package.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "c6d9f63e516e098cbcac16618dd011c51b9137bb7efe1f94e2a5a8118974a936"
+      "sha256": "8573eb0acb5e42addbb2ecae26ad62b41119219d69a43aa2be9079b2e8942f40"
     },
     {
       "path": "pnpm-workspace.yaml",

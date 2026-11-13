@@ -5,7 +5,7 @@ A private home for the files, links, and snippets you reach for often.
 ## Workspace
 
 - `apps/desktop`: Electron + React desktop app, shared by macOS and Windows.
-- `apps/web`: existing website placeholder.
+- `apps/web`: TanStack Start site. The landing page describes DeskGarage and links to the Mac download. The web client will live in this same app.
 - `packages/containers`: Effect schemas, typed errors, storage service, and container operations.
 - `packages/workspace`: shared workspace/file schemas, bridge contracts, and typed errors.
 - `packages/ui`: shadcn components, `cn`, and shared Tailwind styles.
@@ -48,6 +48,16 @@ Drag a saved file out or use **Save a copy** to export it. Removing a file moves
 
 `pnpm dev` builds the native TypeScript entry before opening Electron. Restart it after main-process or preload edits. Renderer edits hot reload through Portless.
 
+## Website
+
+```sh
+pnpm dev:web
+```
+
+Portless serves the site at `https://desk-garage-web.localhost`. The landing page reads the newest GitHub release that includes Mac zip files and links the Apple silicon and Intel downloads. When that request fails, the page links to the releases list. The TanStack Start plugin generates `apps/web/src/route-tree.gen.ts`; commit that file and do not edit it by hand.
+
+`pnpm build` produces a Cloudflare Worker bundle and does not need Cloudflare credentials. `pnpm --filter desk-garage-web run deploy` publishes the `desk-garage-web` worker. GitHub Actions runs that deploy when `alpha` changes the site, using the `CLOUDFLARE_API_TOKEN` repository secret.
+
 ## Development tools
 
 The TanStack Devtools launcher opens Router and React Layout panels in development. Router shows the active route and navigation state; React Layout inspects the workspace definition, generated pages, and composables. Its Vite plugin enables source locations and temporary render-state previews. The inspector is lazy-loaded only in development and excluded from production builds.
@@ -61,7 +71,7 @@ pnpm test
 pnpm format:check
 ```
 
-GitHub Actions runs that sequence on every push and pull request. The build step compiles the desktop app: the Electron main process and the renderer.
+GitHub Actions runs that sequence on every push and pull request. The build step compiles the desktop app and the website's Cloudflare Worker bundle. The website deploy is a separate workflow.
 
 ## Releases
 
@@ -69,6 +79,6 @@ Versions use [Changesets](https://changesets.dev). Every package is private, and
 
 Run `pnpm changeset`, choose the packages and the bump for each one, and write the note. That adds a markdown file under `.changeset/`. A package that is not named keeps its version. Packages that depend on a released package are patch bumped only when their dependency range would be incompatible.
 
-The release runs only after a pull request is merged. Merging into `alpha` versions the named packages as an alpha, merging into `beta` versions them as a beta, and merging into `main` versions them as a stable release. A direct push does not publish. This branch is in Changesets prerelease mode `alpha`. The GitHub release is the desktop app, tagged with `desk-garage-desktop`'s version, and it is skipped when that package's version did not change. The release attaches unsigned Mac zip files for Apple silicon and Intel. Gatekeeper will ask you to open the app from the Finder the first time.
+The release runs only after a pull request is merged. Merging into `alpha` versions the named packages as an alpha, merging into `beta` versions them as a beta, and merging into `main` versions them as a stable release. A direct push does not publish. This branch is in Changesets prerelease mode `alpha`. The GitHub release is the desktop app, tagged with `desk-garage-desktop`'s version, and it is skipped when that package's version did not change. The release attaches unsigned Mac zip files for Apple silicon and Intel. macOS quarantines that download and reports the app as damaged. Unzip it, then in that folder run `xattr -cr DeskGarage.app` before opening it.
 
 The roadmap is private desktop containers, shared containers with authorized-device access, then mobile CRUD and incoming OS sharing. An agent interface can follow through MCP.

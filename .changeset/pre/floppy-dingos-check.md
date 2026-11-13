@@ -1,5 +1,4 @@
 ---
-
 "desk-garage-desktop": patch
 "@desk-garage/containers": patch
 "@desk-garage/theme": patch
