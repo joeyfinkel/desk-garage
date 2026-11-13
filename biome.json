@@ -12,7 +12,8 @@
       "!**/dist/**",
       "!**/route-tree.gen.ts",
       "!**/dist-electron/**",
-      "!**/.output/**"
+      "!**/.output/**",
+      "!**/.wrangler/**"
     ]
   },
   "formatter": {

@@ -56,6 +56,8 @@ pnpm dev:web
 
 Portless serves the site at `https://desk-garage-web.localhost`. The landing page reads the newest GitHub release that includes Mac zip files and links the Apple silicon and Intel downloads. When that request fails, the page links to the releases list. The TanStack Start plugin generates `apps/web/src/route-tree.gen.ts`; commit that file and do not edit it by hand.
 
+`pnpm build` produces a Cloudflare Worker bundle and does not need Cloudflare credentials. `pnpm --filter desk-garage-web run deploy` publishes the `desk-garage-web` worker. GitHub Actions runs that deploy when `alpha` changes the site, using the `CLOUDFLARE_API_TOKEN` repository secret.
+
 ## Development tools
 
 The TanStack Devtools launcher opens Router and React Layout panels in development. Router shows the active route and navigation state; React Layout inspects the workspace definition, generated pages, and composables. Its Vite plugin enables source locations and temporary render-state previews. The inspector is lazy-loaded only in development and excluded from production builds.
@@ -69,7 +71,7 @@ pnpm test
 pnpm format:check
 ```
 
-GitHub Actions runs that sequence on every push and pull request. The build step compiles the desktop app: the Electron main process and the renderer.
+GitHub Actions runs that sequence on every push and pull request. The build step compiles the desktop app and the website's Cloudflare Worker bundle. The website deploy is a separate workflow.
 
 ## Releases
 

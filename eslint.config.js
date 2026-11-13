@@ -2,7 +2,7 @@ import stylistic from '@stylistic/eslint-plugin';
 import typescriptEslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['**/dist/**', '**/dist-electron/**', '**/.output/**', '**/node_modules/**', '**/route-tree.gen.ts'] },
+  { ignores: ['**/dist/**', '**/dist-electron/**', '**/.output/**', '**/.wrangler/**', '**/node_modules/**', '**/route-tree.gen.ts'] },
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx,mts,cts}'],
     languageOptions: { parser: typescriptEslint.parser, parserOptions: { ecmaFeatures: { jsx: true } } },

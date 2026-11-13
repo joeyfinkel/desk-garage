@@ -138,28 +138,28 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "ffff44f2f4d41db1c18689e21bb4aac1809d3fc44ee1743143186a0b615146d4"
+      "sha256": "f139cc572dc9bae58b3b030192fa1e3a41a482bddc0e454ccf32b6ff74275bdb"
     },
     {
       "path": "README.md",
       "owner": {
         "type": "project"
       },
-      "sha256": "9658dd1b0694014e1530be4a1fc6ca12c183f0388ae49efc74c9527bb4307dc6"
+      "sha256": "a9d63f8ca2d47f44fb67e1d682e4cae070a03b1a087246cc5a788e39bd48413e"
     },
     {
       "path": "apps/web/README.md",
       "owner": {
         "type": "project"
       },
-      "sha256": "00e00981b8aa642c2efdac0a6387457bd8778332843931f028e56746adfa1d41"
+      "sha256": "1357da1218c2ed085afbfe45dabf527d203642b8f35468a813b82ea5a743bb2d"
     },
     {
       "path": "apps/web/package.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "97c7105fb006e6b688c30c4983d02e3eba7268e4beda3242af1b27a3f30d2b31"
+      "sha256": "b8d6633cfac35475292b1328158d4175f944ef0cb5dfdecf74d963a14235af57"
     },
     {
       "path": "apps/web/tsconfig.json",
@@ -173,21 +173,21 @@
       "owner": {
         "type": "project"
       },
-      "sha256": "89032063fad773e54531b0bd86bdcb4d666f9f2cd3a887274b2927494737e039"
+      "sha256": "6a457f7ca80d3c599bdce8cf69d54a3b6ed5e23e8b7de3a9ede6eba358245123"
     },
     {
       "path": "biome.json",
       "owner": {
         "type": "project"
       },
-      "sha256": "9283344aa8c6375a98b78f219be7c20a2573406bd4d7214c37c01a3fa9815e43"
+      "sha256": "fdce688ba73cb4b14ad628430fc4d0c3b08da165752085c443fe56915735acae"
     },
     {
       "path": "eslint.config.js",
       "owner": {
         "type": "project"
       },
-      "sha256": "2d5cc6359c231f01c5be6f998307a7c87d6d6e407a0d74f1a711449d057f9995"
+      "sha256": "928e81c244e77591b9f9c6de72a7d10a0a1b144f56248235e23d915ad809cc94"
     },
     {
       "path": "package.json",
