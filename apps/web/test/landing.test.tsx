@@ -4,6 +4,7 @@ import { act, createElement, type ReactElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, expect, it, vi } from 'vite-plus/test';
 import type { Downloads } from '../src/downloads';
+import { DownloadsPage } from '../src/routes/-components/downloads-page';
 import { LandingPage } from '../src/routes/-components/page';
 
 const downloads: Downloads = {
@@ -58,7 +59,7 @@ it('describes DeskGarage and offers one direct Mac download', () => {
   expect(view.querySelector('a[href$="x64.zip"]')).not.toBeNull();
   expect(view.querySelector('a[href$="arm64.zip"]')).toBeNull();
   expect(view.textContent).toContain('Version 1.0.0-alpha.1');
-  expect(view.textContent).toContain('xattr -cr DeskGarage.app');
+  expect(view.textContent).toContain('xattr -cr /Applications/DeskGarage.app');
 });
 
 it('disables downloading when no Mac zip is available', () => {
@@ -108,6 +109,69 @@ it.each([
   expect(view?.querySelector(`a[href$="${available}.zip"]`)).not.toBeNull();
   expect(view?.textContent).not.toContain('Download unavailable');
   expect(view?.querySelector('select')).toBeNull();
+});
+
+it('lists every available build with platform logos and direct downloads', () => {
+  const view = render(createElement(DownloadsPage, { downloads }));
+
+  expect(view.querySelector('h1')?.textContent).toBe('Download DeskGarage');
+  expect(view.querySelectorAll('img[alt="Apple"]')).toHaveLength(downloads.mac.length);
+
+  for (const download of downloads.mac) {
+    const link = view.querySelector(`a[href="${download.href}"]`);
+
+    expect(link?.textContent).toBe(download.label);
+    expect(link?.hasAttribute('download')).toBe(true);
+  }
+
+  expect(view.textContent).toContain('Version 1.0.0-alpha.1');
+  expect(view.textContent).toContain('xattr -cr /Applications/DeskGarage.app');
+});
+
+it('lists only published builds on the downloads page', () => {
+  const view = render(
+    createElement(DownloadsPage, { downloads: { ...downloads, mac: downloads.mac.filter((item) => item.arch === 'x64') } }),
+  );
+
+  expect(view.querySelectorAll('article')).toHaveLength(1);
+  expect(view.querySelector('a[href$="x64.zip"]')).not.toBeNull();
+  expect(view.querySelector('a[href$="arm64.zip"]')).toBeNull();
+});
+
+it('links the landing page to all downloads', () => {
+  const view = render(createElement(LandingPage, { downloads }));
+
+  expect(view.querySelector('header a[href="/downloads"]')).not.toBeNull();
+  expect(view.querySelector('#download a[href="/downloads"]')?.textContent).toBe('All downloads');
+});
+
+it.each([
+  { architecture: 'arm', label: 'Apple silicon' },
+  { architecture: 'x86', label: 'Intel' },
+])('recommends the $label download for a matching Mac', async ({ architecture, label }) => {
+  vi.stubGlobal('navigator', {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+    maxTouchPoints: 0,
+    userAgentData: { getHighEntropyValues: async () => ({ architecture }) },
+  });
+  let view: HTMLElement | undefined;
+
+  await act(async () => {
+    view = render(createElement(DownloadsPage, { downloads }));
+  });
+
+  const recommended = Array.from(view?.querySelectorAll('article') ?? []).filter((card) =>
+    card.textContent?.includes('Recommended for your Mac'),
+  );
+
+  expect(recommended).toHaveLength(1);
+  expect(recommended[0]?.querySelector('h2')?.textContent).toContain(label);
+});
+
+it('does not recommend a build when the Mac architecture is unknown', () => {
+  const view = render(createElement(DownloadsPage, { downloads }));
+
+  expect(view.textContent).not.toContain('Recommended for your Mac');
 });
 
 function render(element: ReactElement) {

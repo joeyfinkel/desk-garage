@@ -63,6 +63,9 @@ export function DownloadLinks({ downloads }: { downloads: Downloads }) {
           </select>
         </label>
       ) : null}
+      <a href="/downloads" className="text-sm text-primary underline-offset-4 hover:underline">
+        All downloads
+      </a>
       <p className="text-sm text-muted-foreground">
         {unsupported ? 'Available for macOS only. ' : 'Check your Mac processor if it was not detected correctly. '}
       </p>
@@ -70,8 +73,8 @@ export function DownloadLinks({ downloads }: { downloads: Downloads }) {
         {downloads.version ? `Version ${downloads.version}. ` : null}
         {downloads.mac.length > 0 ? (
           <>
-            Unsigned Mac zip. macOS quarantines the download and reports the app as damaged. Unzip it, then in that folder run{' '}
-            <code className="text-foreground">xattr -cr DeskGarage.app</code> before opening it.
+            Unsigned Mac app. Open the DMG (or unzip older downloads) and move DeskGarage into Applications. If macOS blocks it, run{' '}
+            <code className="text-foreground">xattr -cr /Applications/DeskGarage.app</code> before opening it.
           </>
         ) : (
           'The Mac download is published with each GitHub release.'
