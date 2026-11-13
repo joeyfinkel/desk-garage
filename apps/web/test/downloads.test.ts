@@ -52,11 +52,28 @@ it('reads the GitHub releases list and caches a successful lookup', async () => 
   expect(fetchImpl).toHaveBeenCalledOnce();
 });
 
-it('keeps the releases page available when GitHub does not answer', async () => {
-  const fetchImpl = vi.fn(async () => Response.json({ message: 'nope' }, { status: 500 }));
-  const first = await loadDownloads(fetchImpl);
-  await loadDownloads(fetchImpl);
+it.each(['rate-limit', 'server-error', 'network-error', 'empty', 'malformed'])(
+  'keeps direct downloads available after a %s response',
+  async (failure) => {
+    const fetchImpl = vi.fn(async () => {
+      if (failure === 'network-error') {
+        throw new Error('Network unavailable');
+      }
 
-  expect(first).toEqual(unavailableDownloads());
-  expect(fetchImpl).toHaveBeenCalledTimes(2);
-});
+      if (failure === 'empty') {
+        return Response.json([]);
+      }
+
+      if (failure === 'malformed') {
+        return Response.json({ unexpected: true });
+      }
+
+      return Response.json({ message: 'nope' }, { status: failure === 'rate-limit' ? 403 : 500 });
+    });
+    const first = await loadDownloads(fetchImpl);
+    await loadDownloads(fetchImpl);
+
+    expect(first.mac.map((item) => item.href)).toEqual([arm64.browser_download_url, intel.browser_download_url]);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  },
+);

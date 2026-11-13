@@ -32,6 +32,34 @@ jobs:
           node-version: "24"
           cache: true
 
+      - name: Refresh release download snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          snapshot="apps/web/src/release-snapshot.json"
+          temporary_snapshot="$(mktemp)"
+          trap 'rm -f "$temporary_snapshot"' EXIT
+
+          if gh api repos/joeyfinkel/desk-garage/releases --jq '[.[] | {tag_name,html_url,assets:[.assets[] | {name,browser_download_url}]}]' > "$temporary_snapshot" &&
+            jq -e '
+              try (
+                type == "array" and length > 0 and
+                all(.[];
+                  (.tag_name | type == "string") and
+                  (.html_url | type == "string" and startswith("https://")) and
+                  (.assets | type == "array")
+                ) and
+                any(.[].assets[];
+                  (.name | type == "string" and test("^DeskGarage-.+-(arm64|x64)\\.zip$")) and
+                  (.browser_download_url | type == "string" and startswith("https://"))
+                )
+              ) catch false
+            ' "$temporary_snapshot" > /dev/null; then
+            cp "$temporary_snapshot" "$snapshot"
+          else
+            echo "::warning::Release refresh failed or contained no usable Mac downloads; retaining bundled snapshot."
+          fi
+
       - name: Deploy
         run: pnpm --filter desk-garage-web run deploy
         env:

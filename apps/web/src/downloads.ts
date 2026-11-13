@@ -1,3 +1,5 @@
+import releaseSnapshot from './release-snapshot.json';
+
 const releasesUrl = 'https://github.com/joeyfinkel/desk-garage/releases';
 const releasesApiUrl = 'https://api.github.com/repos/joeyfinkel/desk-garage/releases?per_page=20';
 const cacheTtlMs = 15 * 60 * 1000;
@@ -68,12 +70,13 @@ export async function loadDownloads(fetchImpl: typeof fetch = fetch): Promise<Do
     cachedDownloads = { at: now, downloads };
   }
 
-  return downloads;
+  return downloads.mac.length > 0 ? downloads : downloadsFromReleases(parseReleases(releaseSnapshot));
 }
 
 async function readDownloads(fetchImpl: typeof fetch): Promise<Downloads> {
   try {
     const response = await fetchImpl(releasesApiUrl, {
+      signal: AbortSignal.timeout(5000),
       headers: {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'desk-garage-web',
@@ -81,6 +84,8 @@ async function readDownloads(fetchImpl: typeof fetch): Promise<Downloads> {
     });
 
     if (!response.ok) {
+      console.warn('GitHub release lookup failed', response.status);
+
       return unavailableDownloads();
     }
 
@@ -88,6 +93,8 @@ async function readDownloads(fetchImpl: typeof fetch): Promise<Downloads> {
 
     return downloadsFromReleases(parseReleases(payload));
   } catch {
+    console.warn('GitHub release lookup failed; using bundled downloads');
+
     return unavailableDownloads();
   }
 }
