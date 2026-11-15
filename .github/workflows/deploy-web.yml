@@ -50,7 +50,7 @@ jobs:
                   (.assets | type == "array")
                 ) and
                 any(.[].assets[];
-                  (.name | type == "string" and test("^DeskGarage-.+-(arm64|x64)\\.zip$")) and
+                  (.name | type == "string" and test("^DeskGarage-.+-(arm64|x64)\\.(dmg|zip)$")) and
                   (.browser_download_url | type == "string" and startswith("https://"))
                 )
               ) catch false
