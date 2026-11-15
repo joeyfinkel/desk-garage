@@ -1,5 +1,11 @@
 # desk-garage-desktop
 
+## 1.0.0-alpha.2
+
+### Patch Changes
+
+- 1d197ac: Package Mac releases as unsigned DMGs and prefer DMG downloads on the website, with ZIP fallback for older releases.
+
 ## 1.0.0-alpha.1
 
 ### Patch Changes

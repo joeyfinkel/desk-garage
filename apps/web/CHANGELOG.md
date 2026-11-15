@@ -1,5 +1,15 @@
 # desk-garage-web
 
+## 1.0.0-alpha.3
+
+### Minor Changes
+
+- 5b16046: Add a downloads page with Apple platform logos and direct links to all available Mac builds.
+
+### Patch Changes
+
+- 1d197ac: Package Mac releases as unsigned DMGs and prefer DMG downloads on the website, with ZIP fallback for older releases.
+
 ## 1.0.0-alpha.2
 
 ### Patch Changes
