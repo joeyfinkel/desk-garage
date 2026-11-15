@@ -3,7 +3,7 @@ import releaseSnapshot from './release-snapshot.json';
 const releasesUrl = 'https://github.com/joeyfinkel/desk-garage/releases';
 const releasesApiUrl = 'https://api.github.com/repos/joeyfinkel/desk-garage/releases?per_page=20';
 const cacheTtlMs = 15 * 60 * 1000;
-const macAssetName = /^DeskGarage-.+-(arm64|x64)\.zip$/;
+const macAssetName = /^DeskGarage-.+-(arm64|x64)\.(dmg|zip)$/;
 
 export type MacArch = 'arm64' | 'x64';
 
@@ -106,7 +106,11 @@ function macDownloads(release: Release): MacDownload[] {
     const match = macAssetName.exec(asset.name);
     const arch = match?.[1];
 
-    if ((arch === 'arm64' || arch === 'x64') && !downloads.has(arch) && asset.browser_download_url.startsWith('https://')) {
+    if (
+      (arch === 'arm64' || arch === 'x64') &&
+      (!downloads.has(arch) || (match?.[2] === 'dmg' && !downloads.get(arch)?.href.endsWith('.dmg'))) &&
+      asset.browser_download_url.startsWith('https://')
+    ) {
       downloads.set(arch, { arch, label: macDownloadLabel[arch], href: asset.browser_download_url });
     }
   }

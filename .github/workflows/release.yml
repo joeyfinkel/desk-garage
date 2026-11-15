@@ -138,4 +138,4 @@ jobs:
           if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
             args+=(--prerelease)
           fi
-          gh "${args[@]}" apps/desktop/release/*.zip
+          gh "${args[@]}" apps/desktop/release/*.dmg

@@ -30,8 +30,8 @@ export function LandingPage({ downloads }: { downloads: Downloads }) {
           <img src="/icon.svg" alt="" className="size-9" />
           DeskGarage
         </a>
-        <a href="#download" className="text-sm text-primary">
-          Download
+        <a href="/downloads" className="text-sm text-primary">
+          Downloads
         </a>
       </header>
       <main className="flex flex-1 flex-col gap-20">
