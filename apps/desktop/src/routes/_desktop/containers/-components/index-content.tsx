@@ -10,7 +10,7 @@ import {
   ScreenMessageIcon,
   ScreenMessageTitle,
 } from '../../../../components/screen-message';
-import { GaragePage } from './page';
+import { GaragePage } from '../-pages-config';
 
 export function ContainersIndex() {
   const navigate = useNavigate();

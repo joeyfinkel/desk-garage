@@ -1,4 +1,4 @@
-import { createResourceLayout } from '../../../../utils/layout/layout';
+import { createResourceLayout } from '../-utils/layout/layout';
 
 export const TrashPage = createResourceLayout({
   resource: 'trash',

@@ -68,8 +68,11 @@ importers:
         specifier: 4.1.4
         version: 4.1.4(effect@4.1.4)(react@19.3.1)(scheduler@0.28.0)
       '@jfdevelops/react-layout':
-        specifier: ^2.7.0
-        version: 2.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^4.1.0
+        version: 4.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@jfdevelops/react-layout-adapter-effect':
+        specifier: ^1.0.0
+        version: 1.0.0(effect@4.1.4)(react@19.3.1)
       '@tanstack/react-router':
         specifier: ^1.170.46
         version: 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -87,11 +90,11 @@ importers:
         version: 19.3.1(react@19.3.1)
     devDependencies:
       '@jfdevelops/react-layout-devtools-react':
-        specifier: ^0.4.0
-        version: 0.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.0
+        version: 1.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@jfdevelops/react-layout-devtools-vite':
-        specifier: ^0.1.2
-        version: 0.1.2(@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
+        specifier: ^1.0.0
+        version: 1.0.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
       '@tailwindcss/vite':
         specifier: ^4.3.5
         version: 4.3.5(@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))
@@ -1001,38 +1004,56 @@ packages:
     resolution: {integrity: sha512-sTbCdEy+f850Qqlo3SpGMk7GydQn+IvMDQ/ZkwTuwZvCWsbZrSfysOMIrPiJeaM6nhMZP/cSMcnTwN/PpiOMCA==}
     engines: {node: '>=20.19.0'}
 
-  '@jfdevelops/react-layout-composables@0.6.0':
-    resolution: {integrity: sha512-eSDVrd3MZu5a+CeG1hAw6Bgh1Q9gvs3PKBtTx12HbkvN+ABkaCvHHU2l2ZfMJrzX9h7cWYCQYfuW4e7p2IN5Ag==}
+  '@jfdevelops/react-layout-adapter-arktype@1.0.0':
+    resolution: {integrity: sha512-wsspCFlPuS10+xoyFAkalzlMVyAErNWbvnh4toFPChcBgJro0JEASNgYG14pU/9fALAgkXBZP7mfv+l4O4VBbg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      arktype: ^2.2.8
+      react: '>=18'
+
+  '@jfdevelops/react-layout-adapter-effect@1.0.0':
+    resolution: {integrity: sha512-5ta6oXGiGzAoG4WezdYh56MezcqWVgb/ZvnbK3yONoWp6s3PToc0ud8ou9xzXJ9nWFGOwfrzlxDUqNg1jM7+zg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      effect: ^4.0.0
+      react: '>=18'
+
+  '@jfdevelops/react-layout-adapters@1.0.0':
+    resolution: {integrity: sha512-lGa0cxE9uCq+TyWBKqgZbtyG3VH8f66vsLjg2rG5GyDd0qWOv64dy2jpcxoFPh7cietGgY8KJGLziSvwIcg2mQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      react: '>=18'
+
+  '@jfdevelops/react-layout-composables@1.2.1':
+    resolution: {integrity: sha512-S0uu0f7DyZCbVeSr0aJj4NZlFooWe1OnIyPgHZQ7QnWJQr1I+FzK1rGgK3Mm0TYzRoAzZ8ZqE6uy0rx0SedzUw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@jfdevelops/react-layout-devtools-core@0.4.0':
-    resolution: {integrity: sha512-x1fx0//kRBNXxDFuwRnOXuDSpAZ7LqXRzAp9oTxscCsq+8b8WuYrRkBKomaSDOFG9nWizfpYbCnQIXc0PYjMwA==}
+  '@jfdevelops/react-layout-devtools-core@1.0.0':
+    resolution: {integrity: sha512-PQQo0KdKZHzP1utZpz7uqCsY+Q1zit43fPUGzAs+S71G9vJpNTSDaosyo2HJjFKBK1KvamNSTnNY0fcDtL/j2w==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
-  '@jfdevelops/react-layout-devtools-react@0.4.0':
-    resolution: {integrity: sha512-CUD5MUMijXnj+MTXvD8tf5gO5PBas0bjU8l+8zK2MeqTsEphm1gefJ0ebSpAtmb9jSCYbnrXCqVPxn7bIQ5EwA==}
+  '@jfdevelops/react-layout-devtools-react@1.0.0':
+    resolution: {integrity: sha512-b+B+FS48cl83lWK+JafOmPtOEdyTIx8ZUDk/23b3qt8CjgcnY43bHGFpeNY0sbqJTwZmBn4fLbN/Oi+WRnO29Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@jfdevelops/react-layout-devtools-vite@0.1.2':
-    resolution: {integrity: sha512-KAVixo+ZITspl2U1dNDqQuATvZ7ozgGHwJeh0nCCtbVG/rbLWKLNvvpA+9wxmoJcYCYjlvIz+ENg+iJ/LQGwbA==}
+  '@jfdevelops/react-layout-devtools-vite@1.0.0':
+    resolution: {integrity: sha512-Vu768j6QVyafVk9cW7dzMP5iAKmY8fE2AQZW6dqmQ+Zx+qOfXkk0ooeNixBnp2XzjASOjU5afym8MvcwLHJyMg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  '@jfdevelops/react-layout-validator@0.5.0':
-    resolution: {integrity: sha512-GYuW7eAcYpXTUiodIPW6CZyj7Vnm4CHn3zMpWKjgI3jMHL1FipXWYV1c7ZUnFufjvDqD5j74KexUoO7vd1L2qA==}
+  '@jfdevelops/react-layout-validator@1.2.0':
+    resolution: {integrity: sha512-l5m7dlrRoIHCwnKJmJFqNJyuDNt3rQMWvQVK3+07aqGsp5OHNtwE2KvrBhCZDfdGR4ZbNA9rLMicQF1RjoHbig==}
     engines: {node: ^20.19.0 || >=22.12.0}
-    peerDependencies:
-      react: '>=18'
 
-  '@jfdevelops/react-layout@2.7.0':
-    resolution: {integrity: sha512-/Ts1xSsiFwaMLevUci+mJTlm1KioWfQFZZXw836xGkgzrBgdlnu7hC1JbbYgFCgSZAT2yDgxuI/4/DvnYFK4QA==}
+  '@jfdevelops/react-layout@4.1.0':
+    resolution: {integrity: sha512-5uiCfGOGQD7bVvWI05C3E1LJiPdV8iT+KzPhYBxI1R6Hpar6oQXMeTpAGtJRVNIBWA+1nIKOFYT1u4BPfbug3A==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       react: '>=18'
@@ -5790,40 +5811,56 @@ snapshots:
     dependencies:
       '@standard-schema/spec': 1.1.0
 
-  '@jfdevelops/react-layout-composables@0.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@jfdevelops/react-layout-adapter-arktype@1.0.0(arktype@2.2.8)(react@19.3.1)':
     dependencies:
-      '@jfdevelops/create-error': 0.2.1
-      '@jfdevelops/react-layout-validator': 0.5.0(react@19.3.1)
+      '@jfdevelops/react-layout-adapters': 1.0.0(react@19.3.1)
+      '@standard-schema/spec': 1.1.0
       arktype: 2.2.8
       react: 19.3.1
+
+  '@jfdevelops/react-layout-adapter-effect@1.0.0(effect@4.1.4)(react@19.3.1)':
+    dependencies:
+      '@jfdevelops/react-layout-adapters': 1.0.0(react@19.3.1)
+      effect: 4.1.4
+      react: 19.3.1
+
+  '@jfdevelops/react-layout-adapters@1.0.0(react@19.3.1)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      react: 19.3.1
+
+  '@jfdevelops/react-layout-composables@1.2.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@jfdevelops/create-error': 0.2.1
+      '@jfdevelops/react-layout-validator': 1.2.0
+      react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@jfdevelops/react-layout-devtools-core@0.4.0': {}
+  '@jfdevelops/react-layout-devtools-core@1.0.0': {}
 
-  '@jfdevelops/react-layout-devtools-react@0.4.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@jfdevelops/react-layout-devtools-react@1.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@jfdevelops/react-layout-devtools-vite@0.1.2(@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))':
+  '@jfdevelops/react-layout-devtools-vite@1.0.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))':
     dependencies:
       magic-string: 0.30.21
       typescript: 6.0.3
       vite: '@voidzero-dev/vite-plus-core@1.6.0(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)'
 
-  '@jfdevelops/react-layout-validator@0.5.0(react@19.3.1)':
+  '@jfdevelops/react-layout-validator@1.2.0':
     dependencies:
       '@jfdevelops/create-error': 0.2.1
       '@standard-schema/spec': 1.1.0
-      arktype: 2.2.8
-      react: 19.3.1
 
-  '@jfdevelops/react-layout@2.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@jfdevelops/react-layout@4.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@jfdevelops/create-error': 0.2.1
-      '@jfdevelops/react-layout-composables': 0.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@jfdevelops/react-layout-devtools-core': 0.4.0
-      '@jfdevelops/react-layout-validator': 0.5.0(react@19.3.1)
+      '@jfdevelops/react-layout-adapter-arktype': 1.0.0(arktype@2.2.8)(react@19.3.1)
+      '@jfdevelops/react-layout-composables': 1.2.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@jfdevelops/react-layout-devtools-core': 1.0.0
+      '@jfdevelops/react-layout-validator': 1.2.0
       arktype: 2.2.8
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)

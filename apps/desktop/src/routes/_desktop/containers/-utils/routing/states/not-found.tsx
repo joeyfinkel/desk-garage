@@ -1,5 +1,5 @@
-import { createRenderState } from '../../utils/layout/base';
-import { NotFound } from '../-components/not-found';
+import { createRenderState } from '../../../../-utils/layout/base';
+import { NotFound } from '../../../../../-components/not-found';
 
 export const notFoundState = createRenderState({
   state: 'NotFound',

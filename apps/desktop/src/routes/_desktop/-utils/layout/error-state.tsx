@@ -1,20 +1,20 @@
 import { CircleAlert } from 'lucide-react';
-import { createProp } from '@jfdevelops/react-layout';
+import { optionalReactNode } from '../../../../utils/optional-react-node';
 import {
   ScreenMessage,
   ScreenMessageActions,
   ScreenMessageDescription,
   ScreenMessageIcon,
   ScreenMessageTitle,
-} from '../../components/screen-message';
+} from '../../../../components/screen-message';
 import { createRenderState } from './base';
 
 export const errorState = createRenderState({
   state: 'Error',
   props: {
     custom: {
-      message: createProp.component({ type: 'ReactNode' }).optional(),
-      actions: createProp.component({ type: 'ReactNode' }).optional(),
+      message: optionalReactNode(),
+      actions: optionalReactNode(),
     },
   },
   render: function ResourceError({ message, actions }, { composables }) {

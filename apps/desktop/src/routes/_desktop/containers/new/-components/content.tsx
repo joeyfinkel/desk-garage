@@ -1,5 +1,5 @@
 import { getRouteApi, Link } from '@tanstack/react-router';
-import { CreateContainerPage } from './page';
+import { CreateContainerPage } from '../../-pages-config';
 import { ContainerForm } from '../../../../../components/container-form';
 import { Button } from '@desk-garage/ui/button';
 
