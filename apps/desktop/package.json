@@ -17,7 +17,8 @@
     "@desk-garage/ui": "workspace:*",
     "@desk-garage/workspace": "workspace:*",
     "@effect/atom-react": "4.1.4",
-    "@jfdevelops/react-layout": "^2.7.0",
+    "@jfdevelops/react-layout": "^4.1.0",
+    "@jfdevelops/react-layout-adapter-effect": "^1.0.0",
     "@tanstack/react-router": "^1.170.46",
     "effect": "^4.1.4",
     "lucide-react": "^0.577.0",
@@ -25,8 +26,8 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@jfdevelops/react-layout-devtools-react": "^0.4.0",
-    "@jfdevelops/react-layout-devtools-vite": "^0.1.2",
+    "@jfdevelops/react-layout-devtools-react": "^1.0.0",
+    "@jfdevelops/react-layout-devtools-vite": "^1.0.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/devtools-vite": "^0.8.6",
     "@tanstack/react-devtools": "^0.10.14",

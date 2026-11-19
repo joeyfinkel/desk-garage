@@ -1,14 +1,12 @@
-import { createProp } from '@jfdevelops/react-layout';
+import { optionalReactNode } from '../../../../utils/optional-react-node';
 import { createRenderState } from './base';
 
-// TODO this should onlyh be used to build the other stats, this should not be used directly as a state
 export const layoutState = createRenderState({
   state: 'Layout',
   props: {
     include: { title: true, description: 'optional' },
     custom: {
-      children: createProp.component({ type: 'ReactNode' }),
-      summary: createProp.component({ type: 'ReactNode' }).optional(),
+      summary: optionalReactNode(),
     },
   },
   render: function LayoutState({ title, description, summary, children }, { composables }) {

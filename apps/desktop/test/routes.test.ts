@@ -222,7 +222,10 @@ describe('desktop routes', () => {
       expect(command).toHaveBeenCalledTimes(2);
       expect(element.querySelector('[role="status"]')).not.toBeNull();
       await act(async () => completeLoad?.({ ok: true, value: { version: 1, revision: 0, containers: [], items: [] } }));
-      expect(element.textContent).toContain('Container not found');
+      await vi.waitFor(async () => {
+        await act(async () => {});
+        expect(element.textContent).toContain('Container not found');
+      });
       expect(element.textContent).toContain('Look in trash');
       expect(element.querySelector('[role="alert"]')).toBeNull();
     } finally {

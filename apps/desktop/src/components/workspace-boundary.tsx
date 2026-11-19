@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button } from '@desk-garage/ui/button';
-import { createResourceLayout } from '../utils/layout/layout';
+import { createResourceLayout } from '../routes/_desktop/-utils/layout/layout';
 import { useContainerWorkspace } from '../routes/-utils/containers';
 
 const WorkspacePage = createResourceLayout({ resource: 'workspace', name: 'WorkspacePage', title: 'Your garage' });

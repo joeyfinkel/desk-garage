@@ -1,7 +1,7 @@
 import { getRouteApi, Link } from '@tanstack/react-router';
 import { Button } from '@desk-garage/ui/button';
 import { FileShelf } from '../../../../../components/file-shelf';
-import { ContainerPage } from '../../-components/page';
+import { ContainerPage } from '../../-pages-config';
 import { useContainerWorkspace } from '../../../../-utils/containers';
 
 export function ContainerDetail() {

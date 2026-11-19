@@ -1,4 +1,5 @@
 import { defineResourceLayout } from './base';
+import './lazy-defaults';
 import { layoutState } from './layout-state';
 import { defaultState } from './default-state';
 import { loadingState } from './loading-state';
@@ -9,4 +10,4 @@ export const workspaceLayout = defineResourceLayout({
   render: { ...layoutState, ...defaultState, ...loadingState, ...errorState, ...notFoundState },
 });
 
-export const { createResourceLayout } = workspaceLayout;
+export const { createResourceLayout, createResourceConfig } = workspaceLayout;

@@ -1,5 +1,5 @@
-import { createRenderState } from '../../../../../utils/layout/base';
-import { ContainersIndex } from '../../-components/index-content';
+import { createRenderState } from '../../../../-utils/layout/base';
+import { ContainersIndex } from '../../../-components/index-content';
 
 export const defaultState = createRenderState({
   state: 'default',

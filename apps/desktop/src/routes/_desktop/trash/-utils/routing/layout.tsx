@@ -1,8 +1,8 @@
-import { defineResourceLayout } from '../../../../../utils/layout/base';
-import { defaultState } from './default-state';
-import { loadingState } from '../../../../../utils/layout/loading-state';
-import { errorState } from '../../../../-utils/error-state';
-import { notFoundState } from '../../../../-utils/not-found-state';
+import { defineResourceLayout } from '../../../-utils/layout/base';
+import { defaultState } from './states/default';
+import { loadingState } from './states/loading';
+import { errorState } from './states/error';
+import { notFoundState } from './states/not-found';
 
 const { createResourceLayout } = defineResourceLayout({
   render: { ...defaultState, ...loadingState, ...errorState, ...notFoundState },
